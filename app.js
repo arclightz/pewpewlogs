@@ -1,9 +1,9 @@
 console.log(`Current directory: ${process.cwd()}`);
 require('dotenv').config();
-
-
+const kindeClient = require('./middleware/kindeClient'); // Import the Kinde client
 const createError = require('http-errors');
 const express = require('express');
+const session = require('express-session');
 const app = express();
 
 const path = require('path');
@@ -12,7 +12,7 @@ const logger = require('morgan');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
-const authRouter = require('./routes/auth'); // Include the auth router
+const authRouter = require('./routes/kindeAuth'); // Include the auth router
 const protectedRoute = require('./routes/protectRoute'); // Include the protected route
 const sessionRouter = require('./routes/sessions'); // Include the session router
 const statsRouter = require('./routes/stats'); // Include the stats router
@@ -22,6 +22,11 @@ const connectDB = require('./config/database');
 connectDB();
 
 
+// Middleware to initialize Kinde client
+app.use((req, res, next) => {
+  req.kindeClient = kindeClient;
+  next();
+})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -32,6 +37,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(session({
+  secret: 'your-session-secret',
+  resave: false,
+  saveUninitialized: true
+}));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

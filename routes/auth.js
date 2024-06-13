@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userSchema')
 const bcrypt = require('bcrypt');
 
-
 // Register a new user
 router.post('/register', async (req, res) => {
   try{
@@ -42,5 +41,6 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Login failed. Please try again' });
   }
 });
+
 
 module.exports = router;
