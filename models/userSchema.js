@@ -26,7 +26,6 @@ userSchema.pre('save', async function(next) {
 
 userSchema.index({ email: 1, username: 1 }, { unique: true, background: true });
 
-// Create a model based on the schema
 const User = mongoose.model('User', userSchema);
 
 // Create a model based on the schema

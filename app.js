@@ -1,23 +1,27 @@
 console.log(`Current directory: ${process.cwd()}`);
 require('dotenv').config();
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var authRouter = require('./routes/auth'); // Include the auth router
-var sessionRouter = require('./routes/sessions'); // Include the session router
-var statsRouter = require('./routes/stats'); // Include the stats router
-var weaponsRouter = require('./routes/weapons');
+
+const createError = require('http-errors');
+const express = require('express');
+const app = express();
+
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const authRouter = require('./routes/auth'); // Include the auth router
+const protectedRoute = require('./routes/protectRoute'); // Include the protected route
+const sessionRouter = require('./routes/sessions'); // Include the session router
+const statsRouter = require('./routes/stats'); // Include the stats router
+const weaponsRouter = require('./routes/weapons');
 
 const connectDB = require('./config/database');
 connectDB();
 
 
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,10 +35,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/auth', authRouter); // Use the auth router
-app.use('/sessions', sessionRouter); // Use the session router
-app.use('/stats', statsRouter); // Use the stats router
-app.use('/weapons', weaponsRouter); // Use the weapons router
+app.use('/protected', protectedRoute); 
+app.use('/auth', authRouter); 
+app.use('/sessions', sessionRouter); 
+app.use('/stats', statsRouter); 
+app.use('/weapons', weaponsRouter); 
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
