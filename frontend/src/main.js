@@ -1,5 +1,12 @@
+import router from './router';
+import './assets/tailwind.css'
 import { createApp } from 'vue'
 import './style.css'
-import App from './App.vue'
+import App from './Home.vue'
 
-createApp(App).mount('#app')
+Vue.config.productionTip = false;
+
+new Vue({
+    router,
+    render: h => h(App),
+    }).$mount('#app');
