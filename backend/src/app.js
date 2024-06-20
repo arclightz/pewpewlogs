@@ -47,9 +47,9 @@ app.use(
 );
 
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
+app.use("/", usersRouter);
 app.use("/protected", protectedRoute);
-app.use("/auth", authRouter);
+app.use("/", authRouter);
 app.use("/sessions", sessionRouter);
 app.use("/stats", statsRouter);
 app.use("/weapons", weaponsRouter);

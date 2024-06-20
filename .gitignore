@@ -130,3 +130,4 @@ dist
 .pnp.*
 
 /config/mongodb.conf
+backend/src/routes/kindeAuth.js.temp
