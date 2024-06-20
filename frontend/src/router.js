@@ -10,8 +10,8 @@ import Register from './components/Auth/Register.vue';
 import SessionList from './components/Session/SessionList.vue';
 import SessionDetail from './components/Session/SessionDetail.vue';
 import NewSession from './components/Session/NewSession.vue';
-import ShotList from './components/Shot/ShotList.vue';
-import NewShot from './components/Shot/NewShot.vue';
+//import ShotList from './components/Shot/ShotList.vue';
+//import NewShot from './components/Shot/NewShot.vue';
 
 Vue.use(Router);
 
