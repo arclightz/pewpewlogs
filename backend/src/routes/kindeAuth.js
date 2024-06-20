@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 const { GrantType, KindeClient } = require('@kinde-oss/kinde-nodejs-sdk');
 const { isAuthenticated } = require('../middleware/isAuthenticated');
