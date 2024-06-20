@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: greatpassword
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pewpewlogs-app
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      DB_TYPE: mongodb
+      DB_HOST: mongodb
+      DB_USER: root
+      DB_PASSWORD: greatpassword
+      DB_PORT: 27017
+      DB_DATABASE: pewpewlogs
+      MONGODB_URI: mongodb://root:greatpassword@mongodb:27017/pewpewlogs?authSource=admin
+      JWT_SECRET: supersecret
+      KINDE_ISSUER_URL: https://arclightsec-warpcore.eu.kinde.com
+      KINDE_CLIENT_ID: fc1299e60d7345378a5a899236bb330c
+      KINDE_CLIENT_SECRET: qo3kE9fU1r7SKgxgQAGCSu9APSrgl28tZAOjh7wsUQ6cZk0O
+      KINDE_REDIRECT_URL: http://localhost:3000/auth/callback
+      KINDE_LOGOUT_REDIRECT_URL: http://localhost:3000/
+      KINDE_POST_LOGIN_REDIRECT_URL: http://localhost:3000/profile
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend:/usr/src/app
+    command: npm run dev
+
+volumes:
+  mongo-data:
