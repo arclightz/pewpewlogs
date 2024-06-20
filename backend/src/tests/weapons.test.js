@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const request = require('supertest');
-const app = require('../src/app');
-const Weapon = require('../src/models/weaponSchema');
+const app = require('../app');
+const Weapon = require('../models/weaponSchema');
 
 beforeEach(async () => {
   // Clear the weapons collection before each test
@@ -21,7 +21,7 @@ describe('POST /weapons', () => {
     const response = await request(app)
       .post('/weapons')
       .send(weaponData);
-    
+
     // For debug
     // console.log('Response status:', response.status); // Log status
     // console.log('Response body:', response.body); // Log body
@@ -41,13 +41,10 @@ describe('POST /weapons', () => {
   });
 
   // Add more test cases if needed
-  
-  
-  
+
   // After all tests are done, disconnect Mongoose
   afterAll(async () => {
     await mongoose.disconnect();
   });
 
-  
 });

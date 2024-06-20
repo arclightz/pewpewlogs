@@ -1,5 +1,5 @@
 // testSetup.js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 beforeAll(async () => {
   await mongoose.connect(process.env.MONGODB_URI, {

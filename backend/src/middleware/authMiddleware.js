@@ -1,18 +1,25 @@
-const jwt = require('jsonwebtoken');
+const kindeClient = require("./kindeClient");
 
 function verifyToken(req, res, next) {
-  const token = req.headers['authorization'];
-  if (!token) {
-    return res.status(401).json({ message: 'Access denied' });
-  }
-  
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.userId;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Invalid token' });
-  }
-};
+  const tokenSet = req.session.tokenSet // Retrieve token from session
+  console.log("Token set received from session:", tokenSet);
 
-  module.exports = verifyToken;
+  if (!tokenSet) {
+    return res.status(401).json({ message: "Access vittu denied" });
+  }
+
+  try {
+    const user = kindeClient.getUserDetails(tokenSet.access_token);
+    console.log("User details fetched:", user);
+    if (!user) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    req.user = user;
+    next();
+  } catch (err) {
+    console.error("Error verifying token:", err);
+    res.status(401).json({ message: "Invalid token" });
+  }
+}
+
+module.exports = verifyToken;
