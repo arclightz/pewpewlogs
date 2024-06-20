@@ -29,12 +29,12 @@ services:
       DB_DATABASE: pewpewlogs
       MONGODB_URI: mongodb://root:greatpassword@mongodb:27017/pewpewlogs?authSource=admin
       JWT_SECRET: supersecret
-      KINDE_ISSUER_URL: https://arclightsec-warpcore.eu.kinde.com
+      KINDE_DOMAIN: https://arclightsec-warpcore.eu.kinde.com
       KINDE_CLIENT_ID: fc1299e60d7345378a5a899236bb330c
       KINDE_CLIENT_SECRET: qo3kE9fU1r7SKgxgQAGCSu9APSrgl28tZAOjh7wsUQ6cZk0O
-      KINDE_REDIRECT_URL: http://localhost:3000/auth/callback
-      KINDE_LOGOUT_REDIRECT_URL: http://localhost:3000/
-      KINDE_POST_LOGIN_REDIRECT_URL: http://localhost:3000/profile
+      KINDE_REDIRECT_URI: http://localhost:3000/callback
+      KINDE_LOGOUT_REDIRECT_URI: http://localhost:3000
+      KINDE_POST_LOGIN_REDIRECT_URI: http://localhost:3000/admin
     depends_on:
       - mongodb
     volumes:
