@@ -58,22 +58,22 @@ This application is designed to help users log, manage, and analyze shooting sta
     npm run dev
 
 
-Usage
+## Usage ##
 
-	User Authentication: Users can sign up and log in using various SSO providers.
-	Logging Sessions: Users can log details about their shooting sessions, including date, time, location, weapon, and ammunition.
-	Tracking Shots: Users can record shot placements, distances, and scores.
-	Analyzing Performance: Users can view statistics and analytics to track their progress over time.
-	Additional Features: Users can add notes, trainer signatures, upload photos, set reminders, and export their data.
+- **User Authentication**: Users can sign up and log in using various SSO providers.
+- **Logging Sessions**: Users can log details about their shooting sessions, including date, time, location, weapon, and ammunition.
+- **Tracking Shots**: Users can record shot placements, distances, and scores.
+- **Analyzing Performance**: Users can view statistics and analytics to track their progress over time.
+- **Additional Features**: Users can add notes, trainer signatures, upload photos, set reminders, and export their data.
 
-Contributing
+## Contributing ##
 
 Contributions are welcome! Please fork the repository and create a pull request with your changes. Ensure that your code adheres to the project’s coding standards and includes relevant tests.
 
-License
+## License ##
 
 This project is licensed under the MIT License. See the LICENSE file for more details.
 
-Contact
+## Contact ##
 
-For any questions or suggestions, feel free to open an issue or contact the project maintainer 
+For any questions or suggestions, feel free to open an issue or contact the project maintainer.
