@@ -18,7 +18,7 @@ const sessionRouter = require('./routes/sessions'); // Include the session route
 const statsRouter = require('./routes/stats'); // Include the stats router
 const weaponsRouter = require('./routes/weapons');
 
-const connectDB = require('./config/database');
+const connectDB = require('../config/database');
 connectDB();
 
 

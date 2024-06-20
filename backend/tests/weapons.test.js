@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const request = require('supertest');
-const app = require('../app');
-const Weapon = require('../models/weaponSchema');
+const app = require('../src/app');
+const Weapon = require('../src/models/weaponSchema');
 
 beforeEach(async () => {
   // Clear the weapons collection before each test
