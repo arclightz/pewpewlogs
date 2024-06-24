@@ -1,45 +1,65 @@
 version: '3.8'
 
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
+  mariadb:
+    image: mariadb:10.5
+    container_name: mariadb
     ports:
-      - "27017:27017"
+      - "3306:3306"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: greatpassword
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - mongo-data:/data/db
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - web
 
   app:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: pewpewlogs-app
+    container_name: pewpewlogs
+    networks:
+      - web
     ports:
       - "3000:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.pewpewlogs_http.entrypoints=web"
+      - "traefik.http.routers.pewpewlogs.service=pewpewlogs"
+      - "traefik.http.routers.pewpewlogs_http.rule=Host(`${FQDN_PEWPEWLOGS}`)"
+      - "traefik.http.routers.pewpewlogs_http.middlewares=redirect-web-to-websecure@internal"
+      - "traefik.http.routers.pewpewlogs.rule=Host(`${FQDN_PEWPEWLOGS}`)"
+      - "traefik.http.routers.pewpewlogs.entrypoints=websecure"
+      - "traefik.http.routers.pewpewlogs.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.pewpewlogs.loadBalancer.server.port=3000"
     environment:
-      NODE_ENV: development
-      DB_TYPE: mongodb
-      DB_HOST: mongodb
-      DB_USER: root
-      DB_PASSWORD: greatpassword
-      DB_PORT: 27017
-      DB_DATABASE: pewpewlogs
-      MONGODB_URI: mongodb://root:greatpassword@mongodb:27017/pewpewlogs?authSource=admin
-      JWT_SECRET: supersecret
-      KINDE_DOMAIN: https://arclightsec-warpcore.eu.kinde.com
-      KINDE_CLIENT_ID: fc1299e60d7345378a5a899236bb330c
-      KINDE_CLIENT_SECRET: qo3kE9fU1r7SKgxgQAGCSu9APSrgl28tZAOjh7wsUQ6cZk0O
-      KINDE_REDIRECT_URI: http://localhost:3000/callback
-      KINDE_LOGOUT_REDIRECT_URI: http://localhost:3000
-      KINDE_POST_LOGIN_REDIRECT_URI: http://localhost:3000/admin
+      NODE_ENV: ${NODE_ENV}
+      DB_TYPE: ${DB_TYPE}
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      JWT_SECRET: ${JWT_SECRET}
+      KINDE_DOMAIN: ${KINDE_DOMAIN}
+      KINDE_CLIENT_ID: ${KINDE_CLIENT_ID}
+      KINDE_CLIENT_SECRET: ${KINDE_CLIENT_SECRET}
+      KINDE_REDIRECT_URI: ${KINDE_REDIRECT_URI}
+      KINDE_LOGOUT_REDIRECT_URI: ${KINDE_LOGOUT_REDIRECT_URI}
+      KINDE_POST_LOGIN_REDIRECT_URI: ${KINDE_POST_LOGIN_REDIRECT_URI}
     depends_on:
-      - mongodb
+      - mariadb
     volumes:
       - ./backend:/usr/src/app
     command: npm run dev
 
+networks:
+  web:
+    external: true
+
 volumes:
-  mongo-data:
+  mariadb-data:
