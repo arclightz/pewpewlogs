@@ -16,7 +16,7 @@ services:
     networks:
       - web
 
-  app:
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -44,6 +44,32 @@ services:
       - ./backend:/usr/src/app
       - ./wait-for-it.sh:/wait-for-it.sh
     command: "npm run dev"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pewpewlogs_frontend
+    networks:
+      - web
+    ports:
+      - "5173:5173" # Vite's default port
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.pewpewlogsfront_http.entrypoints=web"
+      - "traefik.http.routers.pewpewlogsfront.service=pewpewlogs"
+      - "traefik.http.routers.pewpewlogsfront_http.rule=Host(`${FQDN_PEWPEWLOGSFRONT}`)"
+      - "traefik.http.routers.pewpewlogsfront_http.middlewares=redirect-web-to-websecure@internal"
+      - "traefik.http.routers.pewpewlogsfront.rule=Host(`${FQDN_PEWPEWLOGSFRONT}`)"
+      - "traefik.http.routers.pewpewlogsfront.entrypoints=websecure"
+      - "traefik.http.routers.pewpewlogsfront.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.pewpewlogsfront.loadBalancer.server.port=5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/usr/src/app
+    #command: "npm run dev"
 
 networks:
   web:
