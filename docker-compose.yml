@@ -7,10 +7,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USERNAME}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mariadb-data:/var/lib/mysql
     networks:
@@ -36,26 +36,14 @@ services:
       - "traefik.http.routers.pewpewlogs.entrypoints=websecure"
       - "traefik.http.routers.pewpewlogs.tls.certresolver=lets-encrypt"
       - "traefik.http.services.pewpewlogs.loadBalancer.server.port=3000"
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      DB_TYPE: ${DB_TYPE}
-      DB_HOST: ${DB_HOST}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_PORT: ${DB_PORT}
-      DB_DATABASE: ${DB_DATABASE}
-      JWT_SECRET: ${JWT_SECRET}
-      KINDE_DOMAIN: ${KINDE_DOMAIN}
-      KINDE_CLIENT_ID: ${KINDE_CLIENT_ID}
-      KINDE_CLIENT_SECRET: ${KINDE_CLIENT_SECRET}
-      KINDE_REDIRECT_URI: ${KINDE_REDIRECT_URI}
-      KINDE_LOGOUT_REDIRECT_URI: ${KINDE_LOGOUT_REDIRECT_URI}
-      KINDE_POST_LOGIN_REDIRECT_URI: ${KINDE_POST_LOGIN_REDIRECT_URI}
+    env_file:
+      - .env
     depends_on:
       - mariadb
     volumes:
       - ./backend:/usr/src/app
-    command: npm run dev
+      - ./wait-for-it.sh:/wait-for-it.sh
+    command: "npm run dev"
 
 networks:
   web:

@@ -3,12 +3,11 @@ require("dotenv").config();
 const config = {
   development: {
     db: {
-      type: process.env.DB_TYPE || 'mongodb',
-      uri: process.env.MONGODB_URI,
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
+      host: process.env.MYSQL_HOSTNAME,
+      user: process.env.MYSQL_USERNAME,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE,
+      type: "mysql",
     },
   },
   production: {

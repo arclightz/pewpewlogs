@@ -7,6 +7,9 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
+# Install bash and mysql-client
+RUN apk update && apk add bash mysql-client
+
 # Install dependencies
 RUN npm install
 
