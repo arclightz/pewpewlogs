@@ -15,6 +15,7 @@ const usersRouter = require("./routes/users");
 const sessionRouter = require("./routes/sessions"); 
 const statsRouter = require("./routes/stats");
 const weaponsRouter = require("./routes/weapons");
+const proxyRouter = require("./routes/proxy");
 
 // Database initialization
 const { connectDB } = require("./config/database");
@@ -73,6 +74,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/sessions", sessionRouter);
 app.use("/api/stats", statsRouter);
 app.use("/api/weapons", weaponsRouter);
+app.use('/api', proxyRouter);
 
 // Error handler for JWT authentication
 app.use((err, req, res, next) => {
