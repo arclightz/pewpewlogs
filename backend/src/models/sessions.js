@@ -1,30 +1,74 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const { DataTypes } = require('sequelize');
 
-const SessionSchema = new Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  date: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  location: {
-    type: String,
-    required: true
-  },
-  shotsFired: {
-    type: Number,
-    required: true
-  },
-  notes: {
-    type: String
-  }
-});
+module.exports = (sequelize) => {
+  const Session = sequelize.define('Session', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW
+    },
+    duration: {
+      type: DataTypes.INTEGER,  // Duration in minutes
+      allowNull: false
+    },
+    // Address fields
+    locationName: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    street: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    country: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    postalCode: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    latitude: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },
+    longitude: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },
+    notes: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    weatherConditions: {
+      type: DataTypes.STRING,
+      allowNull: true
+    }
+  }, {
+    timestamps: true,
+    tableName: 'sessions'
+  });
 
-const Session = mongoose.model('Session', SessionSchema);
+  // Virtual for full address
+  Session.prototype.getFullAddress = function() {
+    const parts = [
+      this.locationName,
+      this.street,
+      this.city,
+      this.postalCode,
+      this.country
+    ].filter(Boolean);  // This removes any undefined or null values
+    return parts.join(', ');
+  };
 
-module.exports = Session;
+  return Session;
+};

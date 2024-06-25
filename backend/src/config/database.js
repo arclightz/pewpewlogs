@@ -1,40 +1,21 @@
-const fs = require('fs');
-const path = require('path');
-const mysql = require('mysql2/promise');
+const { Sequelize } = require('sequelize');
 const config = require('./databaseConfig');
 
-let db;
-
-const runSchemaScript = async () => {
-  const schemaPath = path.join(__dirname, '../../db/schema.sql');
-  const schema = fs.readFileSync(schemaPath, 'utf-8');
-
-  try {
-    const [results] = await db.query('SHOW TABLES LIKE "Weapons"');
-    if (results.length === 0) {
-      await db.query(schema);
-      console.log('Database schema initialized');
-    } else {
-      console.log('Tables already exist. Skipping schema script.');
-    }
-  } catch (err) {
-    console.error('Error running schema script:', err.message);
-  }
-};
+const sequelize = new Sequelize(config.db.database, config.db.user, config.db.password, {
+  host: config.db.host,
+  dialect: 'mysql',
+  logging: false // Set to console.log to see the SQL queries
+});
 
 const connectDB = async () => {
   try {
-    db = await mysql.createConnection({
-      host: config.db.host,
-      user: config.db.user,
-      password: config.db.password,
-      database: config.db.database,
-    });
-    console.log('Connected to MySQL');
-    await runSchemaScript();
+    await sequelize.authenticate();
+    console.log('Connected to MariaDB');
+    await sequelize.sync(); // This will create tables if they don't exist
+    console.log('Database synchronized');
   } catch (err) {
-    console.error('Error connecting to MySQL:', err.message);
+    console.error('Error connecting to MariaDB:', err.message);
   }
 };
 
-module.exports = { connectDB, db };
+module.exports = { sequelize, connectDB };
