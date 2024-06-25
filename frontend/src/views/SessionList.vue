@@ -1,4 +1,3 @@
-<!-- src/views/SessionList.vue -->
 <template>
   <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-6">Shooting Sessions</h1>
@@ -62,14 +61,14 @@
 
 <script>
 import { ref, onMounted } from 'vue';
-import SessionForm from '@/components/SessionForm.vue';
-import Notification from '@/components/Notification.vue';
-import { useSessions } from '@/composables/useSessions';
+import SessionForm from '../components/SessionForm.vue';
+import Notification from '../components/Notifications.vue';
+import { useSessions } from '../composables/useSessions';
 
 export default {
   components: { SessionForm, Notification },
   setup() {
-    const { getSessions, createSession, updateSession, deleteSession } = useSessions();
+    const { getSessions, createSession, updateSession } = useSessions();
     const sessions = ref([]);
     const loading = ref(true);
     const error = ref(null);

@@ -1,4 +1,3 @@
-<!-- App.vue -->
 <template>
   <div id="app">
     <nav v-if="isAuthenticated">
@@ -13,31 +12,36 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
-import { useKindeAuth } from '@kinde-oss/kinde-auth-vue'
+import { ref, onMounted } from 'vue';
+import { login, logout, getUser, handleCallback } from "./services/authService";
 
 export default {
   setup() {
-    const { isAuthenticated, login, logout, getToken } = useKindeAuth()
+    const isAuthenticated = ref(false);
+
+    const checkAuthentication = async () => {
+      const user = await getUser();
+      isAuthenticated.value = !!user;
+      if (user && window.location.search.includes("code=")) {
+        window.location.href = '/dashboard';
+      }
+    };
 
     onMounted(async () => {
-      // Check if we're handling a redirect from Kinde
-      await handleRedirect()
-    })
-
-    const handleRedirect = async () => {
+      // Check if we're handling a redirect from OIDC
       if (window.location.search.includes("code=")) {
         try {
-          await getToken()
-          // Redirect to dashboard after successful login
-          window.location.href = '/dashboard'
+          await handleCallback();
+          await checkAuthentication();
         } catch (error) {
-          console.error('Authentication error:', error)
+          console.error('Authentication error:', error);
         }
+      } else {
+        await checkAuthentication();
       }
-    }
+    });
 
-    return { isAuthenticated, login, logout }
+    return { isAuthenticated, login, logout };
   }
-}
+};
 </script>

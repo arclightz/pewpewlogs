@@ -100,7 +100,7 @@
   
   <script>
   import { ref, onMounted } from 'vue';
-  import { useWeapons } from '@/composables/useWeapons';
+  import { useWeapons } from '../composables/useWeapons';
   
   export default {
     props: {

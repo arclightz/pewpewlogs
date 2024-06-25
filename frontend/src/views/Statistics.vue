@@ -31,7 +31,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
-import { useStats } from '@/composables/useStats'
+import { useStats } from '../composables/useStats'
 
 export default {
   setup() {

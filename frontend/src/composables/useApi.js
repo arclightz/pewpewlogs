@@ -1,20 +1,19 @@
-import axios from 'axios'
-import { useKindeAuth } from '@kinde-oss/kinde-auth-vue'
+import axios from 'axios';
+import { getUser } from '../services/authService';
 
 const api = axios.create({
   baseURL: 'http://localhost:3000/api',
-})
+});
 
-export function useApi() {
-  const { getToken } = useKindeAuth()
+export async function useApi() {
+  const user = await getUser();
 
   api.interceptors.request.use(async (config) => {
-    const token = await getToken()
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    if (user && user.access_token) {
+      config.headers.Authorization = `Bearer ${user.access_token}`;
     }
-    return config
-  })
+    return config;
+  });
 
-  return api
+  return api;
 }

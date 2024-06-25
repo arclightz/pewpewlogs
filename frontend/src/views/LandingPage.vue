@@ -4,8 +4,8 @@
       <nav class="flex justify-between items-center">
         <h1 class="text-3xl font-bold text-yellow-400">PewPewLogs</h1>
         <div>
-          <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 transition duration-300">Login</button>
-          <button class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-2 px-4 rounded-full transition duration-300">Sign Up</button>
+          <button @click="login" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 transition duration-300">Login</button>
+          <button @click="login" class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-2 px-4 rounded-full transition duration-300">Sign Up</button>
         </div>
       </nav>
     </header>
@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-// You can add any necessary imports or logic here
+  import { login } from '../services/authService';
 </script>
 
 <style scoped>

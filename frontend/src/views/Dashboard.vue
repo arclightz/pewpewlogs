@@ -17,22 +17,22 @@
   
   <script>
   import { ref, onMounted } from 'vue'
-  import { useKindeAuth } from '@kinde-oss/kinde-auth-vue'
-  import { useStats } from '@/composables/useStats'
+  import { useStats } from '../composables/useStats'
   
   export default {
-    setup() {
-      const { getUser } = useKindeAuth()
-      const { getOverallStats } = useStats()
-      const user = ref(null)
-      const stats = ref(null)
-  
-      onMounted(async () => {
-        user.value = await getUser()
-        stats.value = await getOverallStats()
-      })
-  
-      return { user, stats }
-    }
+  setup() {
+    const user = ref(null);
+    const stats = ref(null);
+    const { getOverallStats } = useStats();
+
+    onMounted(async () => {
+      user.value = await getUser();
+      if (user.value) {
+        stats.value = await getOverallStats();
+      }
+    });
+
+    return { user, stats };
   }
+};
   </script>
