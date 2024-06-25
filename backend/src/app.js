@@ -1,6 +1,6 @@
 console.log(`Current directory: ${process.cwd()}`);
 require("dotenv").config();
-const kindeClient = require("./middleware/kindeClient"); // Import the Kinde client
+const { kindeClient, authenticateUser } = require('./middleware/auth');
 const createError = require("http-errors");
 const express = require("express");
 const session = require("express-session");
@@ -10,21 +10,43 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 
-const indexRouter = require("./routes/index");
+// Routers
 const usersRouter = require("./routes/users");
-const authRouter = require("./routes/kindeAuth"); // Include the auth router
-const protectedRoute = require("./routes/protectRoute"); // Include the protected route
-const sessionRouter = require("./routes/sessions"); // Include the session router
-const statsRouter = require("./routes/stats"); // Include the stats router
+const sessionRouter = require("./routes/sessions"); 
+const statsRouter = require("./routes/stats");
 const weaponsRouter = require("./routes/weapons");
 
+// Database initialization
 const { connectDB } = require("./config/database");
-connectDB();
 
 // Middleware to initialize Kinde client
 app.use((req, res, next) => {
   req.kindeClient = kindeClient;
   next();
+});
+
+// Kinde login route
+app.get('/login', (req, res) => {
+  res.redirect(req.kindeClient.getLoginUrl());
+});
+
+// Kinde callback route
+app.get('/callback', async (req, res) => {
+  try {
+    const tokens = await req.kindeClient.getTokens(req.url);
+    // Store tokens securely (e.g., in a secure httpOnly cookie)
+    res.cookie('kinde_token', tokens.access_token, { httpOnly: true, secure: true });
+    res.redirect('/dashboard'); // Redirect to your app's dashboard
+  } catch (error) {
+    console.error('Error in Kinde callback:', error);
+    res.status(500).send('Authentication failed');
+  }
+});
+
+// Kinde logout route
+app.get('/logout', (req, res) => {
+  res.clearCookie('kinde_token');
+  res.redirect(req.kindeClient.getLogoutUrl());
 });
 
 // view engine setup
@@ -46,14 +68,20 @@ app.use(
   }),
 );
 
-app.use("/", indexRouter);
-app.use("/", usersRouter);
-app.use("/protected", protectedRoute);
-app.use("/", authRouter);
-app.use("/sessions", sessionRouter);
-app.use("/stats", statsRouter);
-app.use("/weapons", weaponsRouter);
-app.get('/logout', kindeClient.logout());
+app.use("/api/users", usersRouter);
+// app.use("/api/auth", authRouter);
+app.use("/api/sessions", sessionRouter);
+app.use("/api/stats", statsRouter);
+app.use("/api/weapons", weaponsRouter);
+
+// Error handler for JWT authentication
+app.use((err, req, res, next) => {
+  if (err.name === 'UnauthorizedError') {
+    res.status(401).json({ message: 'Invalid token' });
+  } else {
+    next(err);
+  }
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
