@@ -131,3 +131,4 @@ dist
 
 /config/mongodb.conf
 backend/src/routes/kindeAuth.js.temp
+backend/wait-for-it.sh
