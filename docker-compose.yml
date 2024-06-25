@@ -58,7 +58,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
       - "traefik.http.routers.pewpewlogsfront_http.entrypoints=web"
-      - "traefik.http.routers.pewpewlogsfront.service=pewpewlogs"
+      - "traefik.http.routers.pewpewlogsfront.service=pewpewlogsfront"
       - "traefik.http.routers.pewpewlogsfront_http.rule=Host(`${FQDN_PEWPEWLOGSFRONT}`)"
       - "traefik.http.routers.pewpewlogsfront_http.middlewares=redirect-web-to-websecure@internal"
       - "traefik.http.routers.pewpewlogsfront.rule=Host(`${FQDN_PEWPEWLOGSFRONT}`)"
@@ -69,7 +69,8 @@ services:
       - backend
     volumes:
       - ./frontend:/usr/src/app
-    #command: "npm run dev"
+      - /usr/src/app/node_modules
+    command: "npm run dev -- --host 0.0.0.0"
 
 networks:
   web:

@@ -1,5 +1,5 @@
 # Use the official Node.js image as the base image
-FROM node:22.2.0-alpine
+FROM node:20-alpine
 
 # Set the working directory
 WORKDIR /usr/src/app
@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
 # Copy the rest of the application code
 COPY . .
@@ -20,4 +20,4 @@ RUN apk update && apk add bash
 EXPOSE 5173
 
 # Temporary entrypoint to keep the container running for debugging
-CMD ["sh", "-c", "tail -f /dev/null"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
