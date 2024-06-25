@@ -65,6 +65,8 @@ services:
       - "traefik.http.routers.pewpewlogsfront.entrypoints=websecure"
       - "traefik.http.routers.pewpewlogsfront.tls.certresolver=lets-encrypt"
       - "traefik.http.services.pewpewlogsfront.loadBalancer.server.port=5173"
+    env_file:
+      - .env
     depends_on:
       - backend
     volumes:
