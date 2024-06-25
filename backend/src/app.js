@@ -39,7 +39,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(
   session({
-    secret: "kdqp5vQLz72pgRLu9mf0CQB4FdFQNfFWpXaZOuh7",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false }, // True if using HTTPS
