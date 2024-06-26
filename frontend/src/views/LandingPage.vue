@@ -1,20 +1,21 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-700 text-white">
+<div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-700 text-white">
     <header class="container mx-auto px-4 py-6">
       <nav class="flex justify-between items-center">
         <h1 class="text-3xl font-bold text-yellow-400">PewPewLogs</h1>
         <div>
-          <button @click="login" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 transition duration-300">Login</button>
-          <button @click="login" class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-2 px-4 rounded-full transition duration-300">Sign Up</button>
+          <button v-if="!isAuthenticated" @click="handleLogin" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 transition duration-300">Login</button>
+          <button v-if="!isAuthenticated" @click="handleLogin" class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-2 px-4 rounded-full transition duration-300">Sign Up</button>
+          <button v-if="isAuthenticated" @click="handleLogout" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition duration-300">Logout</button>
         </div>
       </nav>
     </header>
-
     <main class="container mx-auto px-4 py-12">
       <div class="text-center mb-12">
         <h2 class="text-5xl font-bold mb-4">Track Your Shooting Progress</h2>
         <p class="text-xl mb-8">Log sessions, analyze performance, and improve your accuracy</p>
-        <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl transition duration-300 transform hover:scale-105">Get Started</button>
+        <button v-if="!isAuthenticated" @click="handleLogin" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl transition duration-300 transform hover:scale-105">Get Started</button>
+        <router-link v-else to="/dashboard" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl transition duration-300 transform hover:scale-105 inline-block">Go to Dashboard</router-link>
       </div>
 
       <div class="grid md:grid-cols-3 gap-8 mb-12">
@@ -49,7 +50,31 @@
 </template>
 
 <script setup>
-  import { login } from '../services/authService';
+import { ref, onMounted } from 'vue';
+import { login, logout, isAuthenticated as checkAuth, getUser } from '../services/authService';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const user = ref(null);
+const isAuthenticated = ref(false);
+
+onMounted(async () => {
+  isAuthenticated.value = await checkAuth();
+  if (isAuthenticated.value) {
+    user.value = await getUser();
+  }
+});
+
+const handleLogin = () => {
+  login();
+};
+
+const handleLogout = async () => {
+  await logout();
+  isAuthenticated.value = false;
+  user.value = null;
+  router.push('/');
+};
 </script>
 
 <style scoped>
