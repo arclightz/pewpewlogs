@@ -42,7 +42,6 @@ services:
       - mariadb
     volumes:
       - ./backend:/usr/src/app
-      - ./wait-for-it.sh:/wait-for-it.sh
     command: "npm run dev"
 
   frontend:
