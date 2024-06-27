@@ -21,8 +21,7 @@ module.exports = (sequelize) => {
     },
     erva: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
-      unique: false
+      allowNull: false
     },
     purchaseDate: {
       type: DataTypes.DATE,
@@ -31,11 +30,27 @@ module.exports = (sequelize) => {
     notes: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    userId: {
+      type: DataTypes.INTEGER,  
+      allowNull: false,
+      references: {
+        model: 'Users',
+        key: 'id'
+      }
     }
   }, {
     timestamps: true,
     tableName: 'weapons'
   });
+
+  Weapon.associate = (models) => {
+    Weapon.belongsTo(models.User, { 
+      foreignKey: 'userId', 
+      as: 'owner',
+      constraints: false
+    });
+  };
 
   return Weapon;
 };

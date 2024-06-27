@@ -1,6 +1,7 @@
 console.log(`Current directory: ${process.cwd()}`);
 require("dotenv").config();
-const { kindeClient, authenticateUser } = require('./middleware/auth');
+const { kindeClient } = require('./middleware/auth');
+const { isAuthenticated } = require('./middleware/isAuthenticated');
 const createError = require("http-errors");
 const express = require("express");
 const session = require("express-session");
@@ -15,34 +16,42 @@ const usersRouter = require("./routes/users");
 const sessionRouter = require("./routes/sessions"); 
 const statsRouter = require("./routes/stats");
 const weaponsRouter = require("./routes/weapons");
-const proxyRouter = require("./routes/proxy");
+const tokenRoutes = require('./routes/token');
 
-// Database initialization
+// Database initialization not needed here?
 const { connectDB } = require("./config/database");
 
+connectDB().then(() => {
+  console.log('Connected to database');
+}).catch(err => {
+  console.error('Database connection failed', err);
+  process.exit(1);
+});
 // Middleware to initialize Kinde client
 app.use((req, res, next) => {
   req.kindeClient = kindeClient;
   next();
 });
-
+console.log(Object.keys(kindeClient));
 // Kinde login route
-app.get('/login', (req, res) => {
-  res.redirect(req.kindeClient.getLoginUrl());
+
+app.get("/login", kindeClient.login(), (req, res) => {
+  return res.redirect("/");
 });
 
-// Kinde callback route
-app.get('/callback', async (req, res) => {
-  try {
-    const tokens = await req.kindeClient.getTokens(req.url);
-    // Store tokens securely (e.g., in a secure httpOnly cookie)
-    res.cookie('kinde_token', tokens.access_token, { httpOnly: true, secure: true });
-    res.redirect('/dashboard'); // Redirect to your app's dashboard
-  } catch (error) {
-    console.error('Error in Kinde callback:', error);
-    res.status(500).send('Authentication failed');
-  }
+app.get("/register", kindeClient.register(), (req, res) => {
+  return res.redirect("/");
 });
+
+app.get("/callback", kindeClient.callback(), (req, res) => {
+  try {
+    return res.redirect("/");
+  } catch (error) {
+    console.error("Error in Kinde callback:", error);
+    return res.status(500).send("Authentication failed");
+    }
+});
+
 
 // Kinde logout route
 app.get('/logout', (req, res) => {
@@ -65,16 +74,49 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, // True if using HTTPS
+    cookie: { secure: true }, // True if using HTTPS
   }),
 );
 
 app.use("/api/users", usersRouter);
-// app.use("/api/auth", authRouter);
 app.use("/api/sessions", sessionRouter);
 app.use("/api/stats", statsRouter);
 app.use("/api/weapons", weaponsRouter);
-app.use('/api', proxyRouter);
+
+// For token retrieval
+app.use('/api/token', tokenRoutes);
+
+// Debug route for auth debugging
+app.get('/debug-auth', async (req, res) => {
+  console.log('Debug: All Headers:', req.headers);
+  console.log('Debug: Authorization Header:', req.headers.authorization);
+  
+  try {
+    const isAuthenticated = await kindeClient.isAuthenticated(req);
+    console.log('Debug: isAuthenticated:', isAuthenticated);
+    
+    if (isAuthenticated) {
+      const userDetails = await kindeClient.getUserDetails(req);
+      console.log('Debug: User Details:', userDetails);
+      res.json({ isAuthenticated, userDetails });
+    } else {
+      res.json({ isAuthenticated, message: 'User is not authenticated' });
+    }
+  } catch (error) {
+    console.error('Debug: Authentication Error:', error);
+    res.status(500).json({ error: 'Authentication check failed' });
+  }
+});
+
+// DEBUG: Route to check session state
+app.get('/session-check', (req, res) => {
+  res.json({
+    sessionExists: !!req.session,
+    tokenSetExists: !!req.session.tokenSet,
+    sessionContent: req.session
+  });
+});
+
 
 // Error handler for JWT authentication
 app.use((err, req, res, next) => {

@@ -1,13 +1,11 @@
-// testSetup.js
-const mongoose = require("mongoose");
+const { sequelize } = require('../models');
 
 beforeAll(async () => {
-  await mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  // Sync the database before running tests
+  await sequelize.sync({ force: true });
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
+  // Close the database connection after all tests are done
+  await sequelize.close();
 });

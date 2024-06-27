@@ -53,6 +53,14 @@ module.exports = (sequelize) => {
     tableName: 'users'
   });
 
+  User.associate = (models) => {
+    User.hasMany(models.Weapon, { 
+      foreignKey: 'userId', 
+      as: 'weapons',
+      constraints: false
+    });
+  };
+  
   // Instance method to get full name
   User.prototype.getFullName = function() {
     return `${this.firstName} ${this.lastName}`;

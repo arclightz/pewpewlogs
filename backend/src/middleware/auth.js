@@ -8,38 +8,46 @@ const options = {
   clientSecret: process.env.KINDE_CLIENT_SECRET,
   redirectUri: process.env.KINDE_REDIRECT_URI,
   postLoginRedirectUri: process.env.KINDE_POST_LOGIN_REDIRECT_URI || '',
-  logoutRedirectUri: process.env.KINDE_LOGOUT_REDIRECT_URI || '',
-  grantType: GrantType.PKCE,
+  logoutRedirectUri: process.env.KINDE_LOGOUT_REDIRECT_URI || '/token',
+  //grantType: GrantType.PKCE,
+  grantType: 'authorization_code', // Make sure this is set
 };
 
 const kindeClient = new KindeClient(options);
 
 const authenticateUser = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (authHeader) {
-    const token = authHeader.split(' ')[1];
-    try {
-      const decodedToken = await kindeClient.verifyToken(token);
-      const [user] = await User.findOrCreate({
-        where: { kindeId: decodedToken.sub },
-        defaults: {
-          email: decodedToken.email,
-          firstName: decodedToken.given_name,
-          lastName: decodedToken.family_name,
-        }
-      });
-      if (user) {
-        req.user = user;
-        next();
-      } else {
-        res.status(401).json({ message: 'User not found' });
-      }
-    } catch (error) {
-      console.error('Token verification error:', error);
-      res.status(401).json({ message: 'Invalid token' });
+  try {
+    const isAuthenticated = await kindeClient.isAuthenticated(req);
+    
+    if (!isAuthenticated) {
+      console.log('User not authenticated. Token might be missing or invalid.');
+      return res.status(401).json({ message: 'User not authenticated' });
     }
-  } else {
-    res.status(401).json({ message: 'Authorization header is missing' });
+
+    const kindeUser = await kindeClient.getUserDetails(req);
+
+    if (!kindeUser) {
+      return res.status(401).json({ message: 'Unable to retrieve user details' });
+    }
+
+    const [user, created] = await User.findOrCreate({
+      where: { kindeId: kindeUser.id },
+      defaults: {
+        email: kindeUser.email,
+        firstName: kindeUser.given_name,
+        lastName: kindeUser.family_name,
+      }
+    });
+
+    if (created) {
+      console.log('New user created:', user.email);
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('Authentication error:', error);
+    res.status(401).json({ message: 'Authentication failed' });
   }
 };
 

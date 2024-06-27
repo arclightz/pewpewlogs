@@ -10,6 +10,16 @@ const config = {
       type: "mysql",
     },
   },
+  test: {
+    db: {
+      host: process.env.TEST_MYSQL_HOSTNAME,
+      user: process.env.MYSQL_USERNAME,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE_TEST || "pewpew_test",
+      port: process.env.MYSQL_PORT || 3306,
+      type: process.env.DB_TYPE || "mysql",
+    },
+  },
   production: {
     db: {
       host: process.env.RDS_HOSTNAME,

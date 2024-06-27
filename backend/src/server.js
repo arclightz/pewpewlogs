@@ -3,8 +3,15 @@
 const app = require('./app');
 const debug = require('debug')('pewpewlogs:server');
 const http = require('http');
+/*
 const { connectDB } = require('./config/database');
-
+connectDB().then(() => {
+  console.log('Connected to database');
+}).catch(err => {
+  console.error('Database connection failed', err);
+  process.exit(1);
+});
+*/
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
@@ -14,12 +21,7 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-connectDB().then(() => {
-  console.log('Connected to database');
-}).catch(err => {
-  console.error('Database connection failed', err);
-  process.exit(1);
-});
+
 
 function normalizePort(val) {
   const port = parseInt(val, 10);
