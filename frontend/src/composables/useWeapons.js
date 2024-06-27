@@ -1,8 +1,6 @@
-import { useApi } from './useApi';
+import api from '../services/api.js';
 
 export function useWeapons() {
-  const api = useApi();
-
   const getWeapons = async () => {
     try {
       const response = await api.get('/weapons');

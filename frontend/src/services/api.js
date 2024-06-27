@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5173', // Replace with your backend API base URL
+  baseURL: 'https://pewpewlogs.mrdj.stream/api', // Replace with your backend API base URL
   withCredentials: true,
   headers: {
     'Accept': 'application/json',
@@ -36,7 +36,7 @@ const api = {
   getUserDetails,
   updateUserDetails,
   createSession,
-  getSessions,
+  getSessions, 
   getSession,
   updateSession,
   deleteSession,

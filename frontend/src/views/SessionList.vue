@@ -59,101 +59,82 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted } from 'vue';
 import SessionForm from '../components/SessionForm.vue';
 import Notification from '../components/Notifications.vue';
 import { useSessions } from '../composables/useSessions';
 
-export default {
-  components: { SessionForm, Notification },
-  setup() {
-    const { getSessions, createSession, updateSession } = useSessions();
-    const sessions = ref([]);
-    const loading = ref(true);
-    const error = ref(null);
-    const showNewSessionForm = ref(false);
-    const isEditing = ref(false);
-    const sessionToEdit = ref(null);
-    const notificationMessage = ref('');
-    const notificationType = ref('success');
+const { getSessions, createSession, updateSession, deleteSession: deleteSessionApi } = useSessions();
 
-    const fetchSessions = async () => {
-      try {
-        loading.value = true;
-        sessions.value = await getSessions();
-      } catch (err) {
-        error.value = err.message;
-      } finally {
-        loading.value = false;
-      }
-    };
+const sessions = ref([]);
+const loading = ref(true);
+const error = ref(null);
 
-    onMounted(fetchSessions);
+const showNewSessionForm = ref(false);
+const isEditing = ref(false);
+const sessionToEdit = ref(null);
+const notificationMessage = ref('');
+const notificationType = ref('success');
 
-    const handleSubmit = async (formData) => {
-      try {
-        if (isEditing.value) {
-          await updateSession(sessionToEdit.value.id, formData);
-          notificationMessage.value = 'Session updated successfully';
-        } else {
-          await createSession(formData);
-          notificationMessage.value = 'New session created successfully';
-        }
-        notificationType.value = 'success';
-        await fetchSessions();
-        showNewSessionForm.value = false;
-      } catch (err) {
-        notificationMessage.value = 'Error: ' + err.message;
-        notificationType.value = 'error';
-      }
-    };
-
-    const editSession = (session) => {
-      sessionToEdit.value = session;
-      isEditing.value = true;
-      showNewSessionForm.value = true;
-    };
-
-    const deleteSession = async (id) => {
-      if (confirm('Are you sure you want to delete this session?')) {
-        try {
-          await deleteSession(id);
-          notificationMessage.value = 'Session deleted successfully';
-          notificationType.value = 'success';
-          await fetchSessions();
-        } catch (err) {
-          notificationMessage.value = 'Error deleting session: ' + err.message;
-          notificationType.value = 'error';
-        }
-      }
-    };
-
-    const cancelForm = () => {
-      showNewSessionForm.value = false;
-      isEditing.value = false;
-      sessionToEdit.value = null;
-    };
-
-    const closeNotification = () => {
-      notificationMessage.value = '';
-    };
-
-    return {
-      sessions,
-      loading,
-      error,
-      showNewSessionForm,
-      isEditing,
-      sessionToEdit,
-      notificationMessage,
-      notificationType,
-      handleSubmit,
-      editSession,
-      deleteSession,
-      cancelForm,
-      closeNotification
-    };
+const fetchSessions = async () => {
+  try {
+    loading.value = true;
+    sessions.value = await getSessions();
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    loading.value = false;
   }
-}
+};
+
+onMounted(fetchSessions);
+
+const handleSubmit = async (formData) => {
+  try {
+    if (isEditing.value) {
+      await updateSession(sessionToEdit.value.id, formData);
+      notificationMessage.value = 'Session updated successfully';
+    } else {
+      await createSession(formData);
+      notificationMessage.value = 'New session created successfully';
+    }
+    notificationType.value = 'success';
+    await fetchSessions();
+    showNewSessionForm.value = false;
+  } catch (err) {
+    notificationMessage.value = 'Error: ' + err.message;
+    notificationType.value = 'error';
+  }
+};
+
+const editSession = (session) => {
+  sessionToEdit.value = session;
+  isEditing.value = true;
+  showNewSessionForm.value = true;
+};
+
+const deleteSession = async (id) => {
+  if (confirm('Are you sure you want to delete this session?')) {
+    try {
+      await deleteSessionApi(id);
+      notificationMessage.value = 'Session deleted successfully';
+      notificationType.value = 'success';
+      await fetchSessions();
+    } catch (err) {
+      notificationMessage.value = 'Error deleting session: ' + err.message;
+      notificationType.value = 'error';
+    }
+  }
+};
+
+const cancelForm = () => {
+  showNewSessionForm.value = false;
+  isEditing.value = false;
+  sessionToEdit.value = null;
+};
+
+const closeNotification = () => {
+  notificationMessage.value = '';
+};
 </script>

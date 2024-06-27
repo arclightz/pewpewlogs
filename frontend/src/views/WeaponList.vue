@@ -1,86 +1,94 @@
 <template>
-  <div class="weapon-list">
-    <h1>Your Weapons</h1>
-    <button @click="showNewWeaponForm = true">Add New Weapon</button>
-    <div v-if="loading">Loading weapons...</div>
-    <div v-else-if="error">Error loading weapons: {{ error }}</div>
-    <div v-else>
-      <div v-for="weapon in weapons" :key="weapon.id" class="weapon-card">
-        <h3>{{ weapon.name }}</h3>
-        <div>Type: {{ weapon.type }}</div>
-        <div>Caliber: {{ weapon.caliber }}</div>
-        <button @click="editWeapon(weapon)">Edit</button>
-        <button @click="deleteWeapon(weapon.id)">Delete</button>
+  <div class="weapon-list p-4 bg-gray-100 min-h-screen">
+    <h1 class="text-2xl font-bold mb-4 text-gray-800">Your Weapons</h1>
+    <button @click="showNewWeaponForm = true" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-600">Add New Weapon</button>
+    <div v-if="loading" class="text-gray-600">Loading weapons...</div>
+    <div v-else-if="error" class="text-red-500">Error loading weapons: {{ error }}</div>
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div v-for="weapon in weapons" :key="weapon.id" class="bg-white p-4 rounded shadow">
+        <h3 class="text-lg font-semibold text-gray-800">{{ weapon.name }}</h3>
+        <div class="text-gray-600">Type: {{ weapon.type }}</div>
+        <div class="text-gray-600">Caliber: {{ weapon.caliber }}</div>
+        <div class="mt-2">
+          <button @click="handleEditWeapon(weapon)" class="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600">Edit</button>
+          <button @click="handleDeleteWeapon(weapon.id)" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
+        </div>
       </div>
     </div>
-
-    <div v-if="showNewWeaponForm" class="modal">
-      <h2>New Weapon</h2>
-      <form @submit.prevent="createWeapon">
-        <!-- Form fields for new weapon -->
-        <button type="submit">Add Weapon</button>
-        <button @click="showNewWeaponForm = false">Cancel</button>
-      </form>
+    <div v-if="showNewWeaponForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">{{ editingWeapon ? 'Edit' : 'New' }} Weapon</h2>
+        <WeaponForm 
+          :weapon="editingWeapon"
+          @submit="editingWeapon ? handleUpdateWeapon : handleCreateWeapon"
+          @cancel="closeForm"
+        />
+      </div>
     </div>
   </div>
 </template>
 
-<script>
-import { ref, onMounted } from 'vue'
-import { useWeapons } from '../composables/useWeapons'
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useWeapons } from '../composables/useWeapons';
+import WeaponForm from '../components/WeaponForm.vue';
 
-export default {
-  setup() {
-    const { getWeapons, createWeapon, updateWeapon, deleteWeapon } = useWeapons()
-    const weapons = ref([])
-    const loading = ref(true)
-    const error = ref(null)
-    const showNewWeaponForm = ref(false)
+const { getWeapons, createWeapon, updateWeapon, deleteWeapon } = useWeapons();
+const weapons = ref([]);
+const loading = ref(true);
+const error = ref(null);
+const showNewWeaponForm = ref(false);
+const editingWeapon = ref(null);
 
-    onMounted(async () => {
-      try {
-        weapons.value = await getWeapons()
-      } catch (e) {
-        error.value = e.message
-      } finally {
-        loading.value = false
-      }
-    })
+onMounted(async () => {
+  try {
+    weapons.value = await getWeapons();
+  } catch (e) {
+    error.value = e.message;
+  } finally {
+    loading.value = false;
+  }
+});
 
-    const handleCreateWeapon = async (weaponData) => {
-      try {
-        await createWeapon(weaponData)
-        weapons.value = await getWeapons()
-        showNewWeaponForm.value = false
-      } catch (e) {
-        error.value = e.message
-      }
-    }
+const handleCreateWeapon = async (weaponData) => {
+  try {
+    await createWeapon(weaponData);
+    weapons.value = await getWeapons();
+    showNewWeaponForm.value = false;
+  } catch (e) {
+    error.value = e.message;
+  }
+};
 
-    const handleEditWeapon = async (weapon) => {
-      // Implement edit functionality
-    }
+const handleEditWeapon = (weapon) => {
+  editingWeapon.value = weapon;
+  showNewWeaponForm.value = true;
+};
 
-    const handleDeleteWeapon = async (weaponId) => {
-      if (confirm('Are you sure you want to delete this weapon?')) {
-        try {
-          await deleteWeapon(weaponId)
-          weapons.value = weapons.value.filter(w => w.id !== weaponId)
-        } catch (e) {
-          error.value = e.message
-        }
-      }
-    }
+const handleUpdateWeapon = async (weaponData) => {
+  try {
+    await updateWeapon(editingWeapon.value.id, weaponData);
+    weapons.value = await getWeapons();
+    showNewWeaponForm.value = false;
+    editingWeapon.value = null;
+  } catch (e) {
+    error.value = e.message;
+  }
+};
 
-    return {
-      weapons,
-      loading,
-      error,
-      showNewWeaponForm,
-      createWeapon: handleCreateWeapon,
-      editWeapon: handleEditWeapon,
-      deleteWeapon: handleDeleteWeapon
+const handleDeleteWeapon = async (weaponId) => {
+  if (confirm('Are you sure you want to delete this weapon?')) {
+    try {
+      await deleteWeapon(weaponId);
+      weapons.value = weapons.value.filter(w => w.id !== weaponId);
+    } catch (e) {
+      error.value = e.message;
     }
   }
-}
+};
+
+const closeForm = () => {
+  showNewWeaponForm.value = false;
+  editingWeapon.value = null;
+};
 </script>

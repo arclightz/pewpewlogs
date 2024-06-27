@@ -1,11 +1,10 @@
-import { useApi } from './useApi';
+import { ref } from 'vue';
+import api from '../services/api';
 
 export function useSessions() {
-  const api = useApi();
-
   const getSessions = async () => {
     try {
-      const response = await api.get('/sessions');
+      const response = await api.getSessions();
       return response.data;
     } catch (error) {
       console.error('Error fetching sessions:', error);
@@ -15,7 +14,7 @@ export function useSessions() {
 
   const getSession = async (sessionId) => {
     try {
-      const response = await api.get(`/sessions/${sessionId}`);
+      const response = await api.getSession(sessionId);
       return response.data;
     } catch (error) {
       console.error('Error fetching session:', error);
@@ -25,7 +24,7 @@ export function useSessions() {
 
   const createSession = async (sessionData) => {
     try {
-      const response = await api.post('/sessions', sessionData);
+      const response = await api.createSession(sessionData);
       return response.data;
     } catch (error) {
       console.error('Error creating session:', error);
@@ -35,7 +34,7 @@ export function useSessions() {
 
   const updateSession = async (sessionId, sessionData) => {
     try {
-      const response = await api.put(`/sessions/${sessionId}`, sessionData);
+      const response = await api.updateSession(sessionId, sessionData);
       return response.data;
     } catch (error) {
       console.error('Error updating session:', error);
@@ -45,7 +44,7 @@ export function useSessions() {
 
   const deleteSession = async (sessionId) => {
     try {
-      await api.delete(`/sessions/${sessionId}`);
+      await api.deleteSession(sessionId);
     } catch (error) {
       console.error('Error deleting session:', error);
       throw error;

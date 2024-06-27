@@ -1,20 +1,6 @@
-<!--
-<template>
-  <div id="app">
-    <nav v-if="isAuthenticated">
-      <router-link to="/dashboard">Dashboard</router-link>
-      <router-link to="/sessions">Sessions</router-link>
-      <router-link to="/weapons">Weapons</router-link>
-      <router-link to="/stats">Statistics</router-link>
-      <button @click="logout">Logout</button>
-    </nav>
-    <router-view></router-view>
-  </div>
-</template>
--->
 <template>
   <div class="min-h-screen bg-blue-900 text-white">
-    <TopNavBar />
+    <TopNavBar v-if="isAuthenticated"/>
     <main class="container mx-auto px-4 py-8">
       <router-view></router-view>
     </main>

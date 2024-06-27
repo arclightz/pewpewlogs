@@ -3,7 +3,6 @@
       <div class="container mx-auto px-4">
         <div class="flex justify-between items-center py-4">
           <div class="flex items-center">
-            <h1 class="text-2xl font-bold text-yellow-400 mr-8">PewPewLogs</h1>
             <nav class="hidden md:flex space-x-4">
               <router-link 
                 v-for="item in menuItems" 
