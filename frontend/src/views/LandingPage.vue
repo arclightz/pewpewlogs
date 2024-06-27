@@ -1,12 +1,12 @@
 <template>
-<div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-700 text-white">
+  <div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-700 text-white">
     <header class="container mx-auto px-4 py-6">
       <nav class="flex justify-between items-center">
         <h1 class="text-3xl font-bold text-yellow-400">PewPewLogs</h1>
         <div>
-          <button v-if="!isAuthenticated" @click="handleLogin" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 transition duration-300">Login</button>
-          <button v-if="!isAuthenticated" @click="handleLogin" class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-2 px-4 rounded-full transition duration-300">Sign Up</button>
-          <button v-if="isAuthenticated" @click="handleLogout" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition duration-300">Logout</button>
+          <button v-if="!$state.user" @click="handleLogin" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 transition duration-300">Login</button>
+          <button v-if="!$state.user" @click="handleRegister" class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-2 px-4 rounded-full transition duration-300">Sign Up</button>
+          <button v-if="$state.user" @click="handleLogout" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition duration-300">Logout</button>
         </div>
       </nav>
     </header>
@@ -14,7 +14,7 @@
       <div class="text-center mb-12">
         <h2 class="text-5xl font-bold mb-4">Track Your Shooting Progress</h2>
         <p class="text-xl mb-8">Log sessions, analyze performance, and improve your accuracy</p>
-        <button v-if="!isAuthenticated" @click="handleLogin" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl transition duration-300 transform hover:scale-105">Get Started</button>
+        <button v-if="!$state.user" @click="handleLogin" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl transition duration-300 transform hover:scale-105">Get Started</button>
         <router-link v-else to="/dashboard" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl transition duration-300 transform hover:scale-105 inline-block">Go to Dashboard</router-link>
       </div>
 
@@ -50,29 +50,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { login, logout, isAuthenticated as checkAuth, getUser } from '../services/authService';
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import state from '../services/state'; 
 
 const router = useRouter();
-const user = ref(null);
-const isAuthenticated = ref(false);
 
-onMounted(async () => {
-  isAuthenticated.value = await checkAuth();
-  if (isAuthenticated.value) {
-    user.value = await getUser();
+onMounted(() => {
+  if (state.kinde && state.kinde.getUser()) {
+    state.user = state.kinde.getUser();
   }
 });
 
 const handleLogin = () => {
-  login();
+  state.kinde.login();
+};
+
+const handleRegister = () => {
+  state.kinde.register();
 };
 
 const handleLogout = async () => {
-  await logout();
-  isAuthenticated.value = false;
-  user.value = null;
+  await state.kinde.logout();
+  state.user = null;
   router.push('/');
 };
 </script>

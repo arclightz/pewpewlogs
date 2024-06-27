@@ -1,13 +1,26 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://pewpewlogs.mrdj.stream/api', // Replace with your backend API base URL
-  withCredentials: true,
+  baseURL: 'https://pewpewlogs.mrdj.stream/api',
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
   },
 });
+
+// Add a request interceptor to include the auth token in headers
+apiClient.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('auth_token'); // Retrieve token from local storage
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+)
 
 export const register = (user) => apiClient.post('/register', user);
 export const login = (user) => apiClient.post('/login', user);

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-blue-900 text-white">
-    <TopNavBar v-if="isAuthenticated"/>
+    <TopNavBar />
     <main class="container mx-auto px-4 py-8">
       <router-view></router-view>
     </main>
@@ -8,17 +8,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { getUser, handleCallback } from "./services/authService";
+import { ref, onMounted, computed } from 'vue';
+import { getUser, handleCallback } from "./services/kinde";
 import TopNavBar from './components/TopNavBar.vue';
+import state from './services/state';
+import { useRouter } from 'vue-router';
 
-const isAuthenticated = ref(false);
+const router = useRouter();
+const user = ref(null);
+
+const isAuthenticated = computed(() => !!user.value);
 
 const checkAuthentication = async () => {
-  const user = await getUser();
-  isAuthenticated.value = !!user;
-  if (user && window.location.search.includes("code=")) {
-    window.location.href = '/dashboard';
+  const currentUser = await getUser();
+  state.user = currentUser;
+  if (currentUser && window.location.search.includes("code=")) {
+    router.push('/dashboard');
   }
 };
 

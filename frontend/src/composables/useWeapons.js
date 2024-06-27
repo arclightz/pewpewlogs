@@ -3,7 +3,7 @@ import api from '../services/api.js';
 export function useWeapons() {
   const getWeapons = async () => {
     try {
-      const response = await api.get('/weapons');
+      const response = await api.getWeapons();
       return response.data;
     } catch (error) {
       console.error('Error fetching weapons:', error);
@@ -23,7 +23,7 @@ export function useWeapons() {
 
   const createWeapon = async (weaponData) => {
     try {
-      const response = await api.post('/weapons', weaponData);
+      const response = await api.addWeapon(weaponData);
       return response.data;
     } catch (error) {
       console.error('Error creating weapon:', error);

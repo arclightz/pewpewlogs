@@ -32,6 +32,7 @@
 import { ref, onMounted } from 'vue';
 import { useWeapons } from '../composables/useWeapons';
 import WeaponForm from '../components/WeaponForm.vue';
+import { getUser } from '../services/kinde'; // Ensure user is authenticated
 
 const { getWeapons, createWeapon, updateWeapon, deleteWeapon } = useWeapons();
 const weapons = ref([]);
@@ -42,6 +43,10 @@ const editingWeapon = ref(null);
 
 onMounted(async () => {
   try {
+    const user = await getUser();
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
     weapons.value = await getWeapons();
   } catch (e) {
     error.value = e.message;
@@ -92,3 +97,7 @@ const closeForm = () => {
   editingWeapon.value = null;
 };
 </script>
+
+<style scoped>
+/* Add any styles you need for the WeaponList component */
+</style>

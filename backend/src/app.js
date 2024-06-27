@@ -5,6 +5,7 @@ const { isAuthenticated } = require('./middleware/isAuthenticated');
 const createError = require("http-errors");
 const express = require("express");
 const session = require("express-session");
+const cors = require('cors');
 const app = express();
 
 const path = require("path");
@@ -62,7 +63,11 @@ app.get('/logout', (req, res) => {
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
-
+// configure the server to include the correct CORS headers
+app.use(cors({ 
+  origin: 'https://pew.mrdj.stream', 
+  credentials: true 
+})); 
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
