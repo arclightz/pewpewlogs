@@ -26,13 +26,16 @@ export function useSessions() {
 
   /**
    * Creates a new shooting session.
-   * @param {Object} sessionData - The data for the new session (e.g., date, location, weaponId).
+   * @param {Object} sessionData - The data for the new session.
    * @returns {Promise<Object>} The created session object.
    */
   const createSession = async (sessionData) => {
     try {
       const newSession = await execute(api.post, '/api/sessions', sessionData);
-      sessions.value.push(newSession); // Add the new session to the local list
+      // Add the new session to the local list, ensuring it's at the top if sorted by date
+      // For simplicity, we'll refetch or insert at beginning if not sorted
+      // A more robust solution might refetch or sort the existing array
+      sessions.value.unshift(newSession); // Add to the beginning for latest first view
       return newSession;
     } catch (err) {
       console.error('Failed to create session:', err);

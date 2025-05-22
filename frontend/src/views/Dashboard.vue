@@ -1,7 +1,6 @@
 <template>
-  <div class="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center text-white px-4">
-    <h1 class="text-4xl font-bold mb-6">Welcome to Your Dashboard, {{ state.user?.name || state.user?.email || 'User' }}!</h1>
-    <p class="text-lg mb-8 text-center">
+  <div class="px-4 py-8"> <h1 class="text-4xl font-bold mb-6">Welcome to Your Dashboard, {{ state.user?.name || state.user?.email || 'User' }}!</h1>
+    <p class="text-lg mb-8 max-w-2xl">
       Here you can quickly access your shooting sessions, manage your weapons, and view your statistics.
     </p>
 
@@ -66,4 +65,6 @@ import state from '../services/state'; // Import global state to display user na
 
 <style scoped>
 /* Scoped styles for this component */
+/* Removed text-center class from the root div to prevent overall centering */
+/* Individual card content is already centered with flex-col items-center justify-center */
 </style>

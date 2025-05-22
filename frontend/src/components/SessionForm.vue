@@ -46,6 +46,28 @@
     </div>
 
     <div class="mb-4">
+      <label for="ammunitionType" class="block text-blue-200 text-sm font-bold mb-2">Ammunition Type:</label>
+      <input
+        type="text"
+        id="ammunitionType"
+        v-model="sessionForm.ammunitionType"
+        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+        placeholder="e.g., 9mm FMJ, .22LR"
+      />
+    </div>
+
+    <div class="mb-4">
+      <label for="ammunitionCount" class="block text-blue-200 text-sm font-bold mb-2">Ammunition Count:</label>
+      <input
+        type="number"
+        id="ammunitionCount"
+        v-model.number="sessionForm.ammunitionCount"
+        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+        min="0"
+      />
+    </div>
+
+    <div class="mb-4">
       <label for="shotsFired" class="block text-blue-200 text-sm font-bold mb-2">Number of Shots Fired:</label>
       <input
         type="number"
@@ -56,7 +78,7 @@
       />
     </div>
 
-    <div class="mb-6">
+    <div class="mb-4">
       <label for="distance" class="block text-blue-200 text-sm font-bold mb-2">Distance to Target (meters):</label>
       <input
         type="number"
@@ -65,6 +87,40 @@
         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
         min="0"
       />
+    </div>
+
+    <div class="mb-4 flex space-x-4">
+      <div class="flex-1">
+        <label for="hits" class="block text-blue-200 text-sm font-bold mb-2">Hits:</label>
+        <input
+          type="number"
+          id="hits"
+          v-model.number="sessionForm.hits"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+          min="0"
+        />
+      </div>
+      <div class="flex-1">
+        <label for="misses" class="block text-blue-200 text-sm font-bold mb-2">Misses:</label>
+        <input
+          type="number"
+          id="misses"
+          v-model.number="sessionForm.misses"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+          min="0"
+        />
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <label for="notes" class="block text-blue-200 text-sm font-bold mb-2">Session Notes:</label>
+      <textarea
+        id="notes"
+        v-model="sessionForm.notes"
+        rows="3"
+        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+        placeholder="Add any observations or details about this session..."
+      ></textarea>
     </div>
 
     <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -86,7 +142,7 @@
 <script setup>
 import { ref, onMounted, defineProps, defineEmits, watch } from 'vue';
 import { useSessions } from '../composables/useSessions';
-import { useWeapons } from '../composables/useWeapons';
+import { useWeapons } from '../composables/useWeapons'; // To get list of weapons
 
 const props = defineProps({
   initialSession: {
@@ -108,9 +164,13 @@ const sessionForm = ref({
   date: new Date().toISOString().split('T')[0], // Default to today's date
   location: '',
   weaponId: '', // Will store the _id of the selected weapon
+  ammunitionType: '',
+  ammunitionCount: 0,
   numberOfShotsFired: 0,
   distanceToTarget: 0,
-  // Add other MVP fields here
+  hits: 0,
+  misses: 0,
+  notes: '',
 });
 
 const errorMessage = ref('');
@@ -144,15 +204,24 @@ const handleSubmit = async () => {
   try {
     // For MVP, we're only implementing create.
     // If isEdit is true, you'd call an updateSession function here.
-    const savedSession = await createSession(sessionForm.value);
+    const payload = { ...sessionForm.value };
+    // Convert date string to Date object for backend
+    payload.date = new Date(payload.date);
+
+    const savedSession = await createSession(payload);
     emit('session-saved', savedSession); // Emit event to parent
     // Reset form after successful submission
     sessionForm.value = {
       date: new Date().toISOString().split('T')[0],
       location: '',
       weaponId: '',
+      ammunitionType: '',
+      ammunitionCount: 0,
       numberOfShotsFired: 0,
       distanceToTarget: 0,
+      hits: 0,
+      misses: 0,
+      notes: '',
     };
   } catch (err) {
     errorMessage.value = err.message || 'Failed to save session.';

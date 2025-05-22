@@ -1,89 +1,78 @@
 <template>
-  <div class="min-h-screen bg-blue-900 text-white">
-    <TopNavBar />
-    <main class="container mx-auto px-4 py-8">
-      <div v-if="isLoading" class="flex justify-center items-center h-64">
-        <p>Loading application...</p>
-      </div>
-      <router-view v-else></router-view>
-    </main>
+  <div class="flex min-h-screen bg-gray-900 text-white">
+    <SideBar :is-sidebar-open="isSidebarOpen" @toggle-sidebar="toggleSidebar" @close-sidebar="closeSidebar" />
+
+    <div
+      :class="{ 'ml-64': isSidebarOpen, 'ml-20': !isSidebarOpen }"
+      class="flex-1 flex flex-col transition-all duration-300 ease-in-out"
+    >
+      <main class="flex-1 px-4 py-8 overflow-y-auto">
+        <div v-if="isLoading" class="flex items-center justify-center h-full">
+          <p>Loading application...</p>
+        </div>
+        <router-view v-else></router-view>
+      </main>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import TopNavBar from './components/TopNavBar.vue';
-import state from './services/state'; // Assuming this is your global reactive state
+import SideBar from './components/SideBar.vue';
+import state from './services/state';
+import authService from './services/authService';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const user = ref(null); // Local ref to hold the user object
-const isLoading = ref(true); // Reactive state to manage loading status
+const user = ref(null);
+const isLoading = ref(true);
+// Start with sidebar collapsed (false) as per the draft image
+const isSidebarOpen = ref(false);
 
-// Computed property to check if the user is authenticated
-// Now checks for the presence of a token in localStorage
 const isAuthenticated = computed(() => {
-  return !!localStorage.getItem('token'); // Check if a token exists
+  return !!localStorage.getItem('token');
 });
 
-/**
- * Checks the current authentication status by looking for a JWT token.
- * Updates the global state and local user ref based on token presence.
- * This function will primarily determine if a user *might* be logged in.
- * Actual user data (e.g., user ID, name) would typically be fetched after login
- * and stored in `state.user`.
- */
 const checkAuthentication = async () => {
   try {
-    // In a JWT flow, the user data is usually decoded from the token
-    // or fetched from a /api/auth/me endpoint after the token is set.
-    // For this App.vue, we're simply checking if a token exists.
     const token = localStorage.getItem('token');
-
     if (token) {
-      // If a token exists, assume the user is authenticated for UI purposes.
-      // The actual user object (e.g., { id: '...', name: '...' }) would be set
-      // by your login component after a successful API call.
-      // For now, we'll just set a placeholder or rely on `state.user` being set elsewhere.
-      // If `state.user` is not populated by a login component, you might need
-      // a dedicated API call here to fetch user details.
-      // Example: const currentUser = await fetch('/api/auth/me', { headers: { 'x-auth-token': token } }).then(res => res.json());
-      // state.user = currentUser;
-      // user.value = currentUser;
-
-      // For the purpose of just indicating "logged in", we can set a dummy user
-      // or rely on a different part of the app to populate `state.user` after login.
-      // Let's assume `state.user` will be populated by the login view.
-      user.value = { isAuthenticated: true }; // Simple indicator
+      await authService.fetchCurrentUser();
+      user.value = state.user;
     } else {
-      user.value = null; // No token, no user
+      state.user = null;
+      user.value = null;
     }
 
-    // No longer need to check for 'code=' in the URL for Kinde callback.
-    // Routing to dashboard after login will be handled by the login component itself.
-    // If the user lands on the root and is authenticated, you might want to redirect them.
     if (isAuthenticated.value && router.currentRoute.value.path === '/') {
        router.push('/dashboard');
     }
-
   } catch (error) {
     console.error('Error during authentication check:', error);
-    // Handle error, e.g., clear token if it's invalid
     localStorage.removeItem('token');
+    state.user = null;
   } finally {
-    isLoading.value = false; // Always set loading to false once check is done
+    isLoading.value = false;
   }
 };
 
-// Lifecycle hook: executed after the component is mounted
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value;
+};
+
+const closeSidebar = () => {
+  // Always close sidebar when a link is clicked, regardless of screen size
+  // This is a common behavior for sidebars that expand/collapse
+  isSidebarOpen.value = false;
+};
+
 onMounted(async () => {
-  // Directly check authentication status based on JWT token presence.
-  // No special handling for OIDC redirect 'code=' needed anymore.
   await checkAuthentication();
+  // On mount, if on desktop, ensure sidebar starts collapsed as per draft
+  // isSidebarOpen.value = window.innerWidth < 768 ? false : false; // Always start collapsed
 });
 </script>
 
 <style scoped>
-/* Add any component-specific styles here if needed */
-/* Tailwind CSS classes are primarily used for styling */
+/* No specific scoped styles needed here, mainly Tailwind classes */
 </style>

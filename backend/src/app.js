@@ -5,9 +5,9 @@ const cors = require('cors');
 const connectDB = require('./config/database'); // Import your database connection function
 const authRoutes = require('./routes/auth'); // Import your new authentication routes
 // const userRoutes = require('./routes/users'); // Example: Import user-related routes
-// const sessionRoutes = require('./routes/sessions'); // Example: Import session-related routes
+const sessionRoutes = require('./routes/sessions'); // Example: Import session-related routes
 const weaponRoutes = require('./routes/weapons'); // <--- IMPORTANT: Import your new weapon routes
-// const statsRoutes = require('./routes/stats'); // Example: Import stats-related routes
+const statsRoutes = require('./routes/stats'); // Example: Import stats-related routes
 
 const app = express();
 
@@ -31,7 +31,10 @@ app.use(cors());
 // Mount your authentication routes under the /api/auth path.
 app.use('/api/auth', authRoutes);
 app.use('/api/weapons', weaponRoutes);
-
+// app.use('/api/users', userRoutes);
+app.use('/api/sessions', sessionRoutes); 
+app.use('/api/weapons', weaponRoutes);
+app.use('/api/stats', statsRoutes); 
 
 // Mount your other application-specific routes.
 // Ensure these files exist and export an Express Router.

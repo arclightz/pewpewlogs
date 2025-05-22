@@ -1,41 +1,32 @@
-import { useApi } from './useApi';
+// frontend/src/composables/useStats.js
+import { ref } from 'vue';
+import api from '../services/api'; // Import the configured axios instance
+import { useApi } from './useApi'; // Import the general useApi composable
 
+/**
+ * A Vue composable for fetching and managing application statistics.
+ */
 export function useStats() {
-  const api = useApi();
+  const stats = ref(null); // Reactive object to store statistics
+  const { data, loading, error, execute } = useApi(); // Use the general API composable
 
-  const getOverallStats = async () => {
+  /**
+   * Fetches overall and per-weapon statistics for the authenticated user.
+   */
+  const fetchStats = async () => {
     try {
-      const response = await api.get('/stats/overall');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching overall stats:', error);
-      throw error;
-    }
-  };
-
-  const getWeaponStats = async () => {
-    try {
-      const response = await api.get('/stats/weapons');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching weapon stats:', error);
-      throw error;
-    }
-  };
-
-  const getRecentSessions = async (limit = 5) => {
-    try {
-      const response = await api.get(`/stats/recent-sessions?limit=${limit}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching recent sessions:', error);
-      throw error;
+      const responseData = await execute(api.get, '/api/stats');
+      stats.value = responseData; // Assuming API returns an object with 'overall' and 'shotsPerWeapon'
+    } catch (err) {
+      console.error('Failed to fetch statistics:', err);
+      // Error state is already handled by useApi, but specific handling can go here
     }
   };
 
   return {
-    getOverallStats,
-    getWeaponStats,
-    getRecentSessions,
+    stats,
+    loading,
+    error,
+    fetchStats,
   };
 }
