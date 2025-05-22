@@ -1,140 +1,51 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">Shooting Sessions</h1>
-    
-    <button
-      @click="showNewSessionForm = true"
-      class="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-    >
-      New Session
-    </button>
+  <div class="container mx-auto px-4 py-8 text-white">
+    <h1 class="text-3xl font-bold mb-6 text-center">Your Shooting Sessions</h1>
 
-    <div v-if="loading" class="text-center py-4">
-      <p class="text-gray-600">Loading sessions...</p>
+    <div v-if="loading" class="text-center text-lg">Loading sessions...</div>
+    <div v-else-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+      <span class="block sm:inline">{{ error }}</span>
     </div>
-
-    <div v-else-if="error" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
-      <p>Error loading sessions: {{ error }}</p>
+    <div v-else-if="sessions.length === 0" class="text-center text-lg text-blue-200">
+      <p>No sessions logged yet.</p>
+      <router-link to="/sessions/new" class="text-blue-400 hover:underline mt-4 block">Log your first session!</router-link>
     </div>
-
-    <div v-else>
-      <div v-for="session in sessions" :key="session.id" class="bg-white shadow rounded-lg p-6 mb-4">
-        <h3 class="text-xl font-semibold mb-2">{{ new Date(session.date).toLocaleDateString() }}</h3>
-        <p class="mb-2">Weapon: {{ session.weapon.name }}</p>
-        <p class="mb-2">Duration: {{ session.duration }} minutes</p>
-        <p class="mb-4">Location: {{ session.location }}</p>
-        <div class="flex space-x-2">
-          <button
-            @click="editSession(session)"
-            class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-          >
-            Edit
-          </button>
-          <button
-            @click="deleteSession(session.id)"
-            class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-          >
-            Delete
-          </button>
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-for="session in sessions" :key="session._id" class="bg-blue-800 p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-2">{{ new Date(session.date).toLocaleDateString() }} - {{ session.location }}</h3>
+        <p class="text-blue-200 mb-1">Weapon: {{ session.weapon?.name || 'N/A' }}</p>
+        <p class="text-blue-200 mb-1">Shots Fired: {{ session.numberOfShotsFired || 0 }}</p>
+        <p class="text-blue-200">Distance: {{ session.distanceToTarget || 'N/A' }}</p>
+        <div class="mt-4 flex justify-end">
+          <!-- <router-link :to="`/sessions/${session._id}`" class="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm">
+            View Details
+          </router-link> -->
         </div>
       </div>
     </div>
 
-    <div v-if="showNewSessionForm" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <h2 class="text-2xl font-bold mb-4">{{ isEditing ? 'Edit' : 'New' }} Session</h2>
-        <SessionForm
-          :session="sessionToEdit"
-          @submit="handleSubmit"
-          @cancel="cancelForm"
-        />
-      </div>
+    <div class="mt-8 text-center">
+      <router-link
+        to="/sessions/new"
+        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+      >
+        Log New Session
+      </router-link>
     </div>
-
-    <Notification
-      :message="notificationMessage"
-      :type="notificationType"
-      @close="closeNotification"
-    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import SessionForm from '../components/SessionForm.vue';
-import Notification from '../components/Notifications.vue';
-import { useSessions } from '../composables/useSessions';
+import { onMounted } from 'vue';
+import { useSessions } from '../composables/useSessions'; // Import the session composable
 
-const { getSessions, createSession, updateSession, deleteSession: deleteSessionApi } = useSessions();
+const { sessions, loading, error, fetchSessions } = useSessions();
 
-const sessions = ref([]);
-const loading = ref(true);
-const error = ref(null);
-
-const showNewSessionForm = ref(false);
-const isEditing = ref(false);
-const sessionToEdit = ref(null);
-const notificationMessage = ref('');
-const notificationType = ref('success');
-
-const fetchSessions = async () => {
-  try {
-    loading.value = true;
-    sessions.value = await getSessions();
-  } catch (err) {
-    error.value = err.message;
-  } finally {
-    loading.value = false;
-  }
-};
-
-onMounted(fetchSessions);
-
-const handleSubmit = async (formData) => {
-  try {
-    if (isEditing.value) {
-      await updateSession(sessionToEdit.value.id, formData);
-      notificationMessage.value = 'Session updated successfully';
-    } else {
-      await createSession(formData);
-      notificationMessage.value = 'New session created successfully';
-    }
-    notificationType.value = 'success';
-    await fetchSessions();
-    showNewSessionForm.value = false;
-  } catch (err) {
-    notificationMessage.value = 'Error: ' + err.message;
-    notificationType.value = 'error';
-  }
-};
-
-const editSession = (session) => {
-  sessionToEdit.value = session;
-  isEditing.value = true;
-  showNewSessionForm.value = true;
-};
-
-const deleteSession = async (id) => {
-  if (confirm('Are you sure you want to delete this session?')) {
-    try {
-      await deleteSessionApi(id);
-      notificationMessage.value = 'Session deleted successfully';
-      notificationType.value = 'success';
-      await fetchSessions();
-    } catch (err) {
-      notificationMessage.value = 'Error deleting session: ' + err.message;
-      notificationType.value = 'error';
-    }
-  }
-};
-
-const cancelForm = () => {
-  showNewSessionForm.value = false;
-  isEditing.value = false;
-  sessionToEdit.value = null;
-};
-
-const closeNotification = () => {
-  notificationMessage.value = '';
-};
+onMounted(() => {
+  fetchSessions(); // Fetch sessions when the component is mounted
+});
 </script>
+
+<style scoped>
+/* Scoped styles for this component */
+</style>

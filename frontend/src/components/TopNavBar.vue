@@ -1,91 +1,46 @@
 <template>
-  <div class="bg-blue-900 text-white">
-    <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center py-4">
-        <div class="flex items-center">
-          <nav class="hidden md:flex space-x-4">
-            <router-link
-              v-for="item in menuItems"
-              :key="item.path"
-              :to="item.path"
-              class="text-white hover:text-yellow-400 transition duration-300"
-            >
-              {{ item.name }}
-            </router-link>
-          </nav>
-        </div>
-        <div class="flex items-center">
-          <button
-            v-if="user"
-            @click="handleLogout"
-            class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition duration-300"
-          >
+  <nav class="bg-blue-800 p-4 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <router-link to="/" class="text-white text-2xl font-bold">Pewpewlogs</router-link>
+
+      <div class="space-x-4">
+        <router-link to="/dashboard" class="text-white hover:text-blue-200">Dashboard</router-link>
+        <router-link to="/sessions" class="text-white hover:text-blue-200">Sessions</router-link>
+        <router-link to="/weapons" class="text-white hover:text-blue-200">Weapons</router-link>
+        <router-link to="/statistics" class="text-white hover:text-blue-200">Statistics</router-link>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <template v-if="state.user">
+          <span class="text-white">Hello, {{ state.user.name || state.user.email }}!</span>
+          <router-link to="/profile" class="text-white hover:text-blue-200">Profile</router-link>
+          <button @click="handleLogout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">
             Logout
           </button>
-          <div v-else>
-            <button
-              @click="handleLogin"
-              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 transition duration-300"
-            >
-              Login
-            </button>
-            <button
-              @click="handleRegister"
-              class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-2 px-4 rounded-full transition duration-300"
-            >
-              Sign Up
-            </button>
-          </div>
-        </div>
+        </template>
+        <template v-else>
+          <router-link to="/login" class="text-white hover:text-blue-200">Login</router-link>
+          <router-link to="/register" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded">
+            Register
+          </router-link>
+        </template>
       </div>
     </div>
-    <!-- Mobile menu (hidden on larger screens) -->
-    <div class="md:hidden">
-      <div class="px-2 pt-2 pb-3 space-y-1">
-        <router-link
-          v-for="item in menuItems"
-          :key="item.path"
-          :to="item.path"
-          class="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-yellow-400 hover:bg-blue-800 transition duration-300"
-        >
-          {{ item.name }}
-        </router-link>
-      </div>
-    </div>
-  </div>
+  </nav>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import state from '../services/state';
-
-const user = computed(() => state.user);
+import state from '../services/state'; // Import your global state
+import authService from '../services/authService'; // Import your authService
 
 const router = useRouter();
 
-const menuItems = ref([
-  { name: 'Dashboard', path: '/dashboard' },
-  { name: 'Sessions', path: '/sessions' },
-  { name: 'Weapons', path: '/weapons' },
-  { name: 'Statistics', path: '/stats' },
-]);
-
-const handleLogin = () => {
-  state.kinde.login();
-};
-
-const handleRegister = () => {
-  state.kinde.register();
-};
-
-const handleLogout = async () => {
-  await state.kinde.logout();
-  state.user = null;
-  router.push('/');
+const handleLogout = () => {
+  authService.logout(); // Call the logout method from your authService
 };
 </script>
 
 <style scoped>
-/* Add any styles you need for the TopNavBar component */
+/* Add any component-specific styles here if needed */
 </style>

@@ -1,69 +1,46 @@
+// frontend/src/services/api.js
 import axios from 'axios';
 
-const apiClient = axios.create({
-  baseURL: 'https://pewpewlogs.mrdj.stream/api',
+// Determine API base URL from environment variables.
+// In development, this will typically be your backend service in Docker Compose.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
   headers: {
-    'Accept': 'application/json',
     'Content-Type': 'application/json',
   },
 });
 
-// Add a request interceptor to include the auth token in headers
-apiClient.interceptors.request.use(
-  config => {
-    const token = localStorage.getItem('auth_token'); // Retrieve token from local storage
+// Request interceptor to attach the JWT token to every outgoing request
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers['x-auth-token'] = token; // Attach token as 'x-auth-token' header
     }
     return config;
   },
-  error => {
+  (error) => {
     return Promise.reject(error);
   }
-)
+);
 
-export const register = (user) => apiClient.post('/register', user);
-export const login = (user) => apiClient.post('/login', user);
-export const getUserDetails = () => apiClient.get('/user-detail');
-export const updateUserDetails = (user) => apiClient.put('/user-detail', user);
-export const createSession = (session) => apiClient.post('/sessions', session);
-export const getSessions = () => apiClient.get('/sessions');
-export const getSession = (id) => apiClient.get(`/sessions/${id}`);
-export const updateSession = (id, session) => apiClient.put(`/sessions/${id}`, session);
-export const deleteSession = (id) => apiClient.delete(`/sessions/${id}`);
-export const addShots = (sessionId, shots) => apiClient.post(`/sessions/${sessionId}/shots`, shots);
-export const getShots = (sessionId) => apiClient.get(`/sessions/${sessionId}/shots`);
-export const getSessionStats = () => apiClient.get('/stats/sessions');
-export const getShootingStats = () => apiClient.get('/stats/shots');
-export const addNoteToSession = (sessionId, note) => apiClient.post(`/sessions/${sessionId}/notes`, note);
-export const uploadSignature = (sessionId, signature) => apiClient.post(`/sessions/${sessionId}/signature`, signature);
-export const uploadPhotos = (sessionId, photos) => apiClient.post(`/sessions/${sessionId}/photos`, photos);
-export const exportSessionsToCSV = () => apiClient.get('/export/sessions/csv');
-export const exportSessionsToPDF = () => apiClient.get('/export/sessions/pdf');
-export const getWeapons = () => apiClient.get('/weapons');
-export const addWeapon = (weapon) => apiClient.post('/weapons', weapon);
-
-const api = {
-  register,
-  login,
-  getUserDetails,
-  updateUserDetails,
-  createSession,
-  getSessions, 
-  getSession,
-  updateSession,
-  deleteSession,
-  addShots,
-  getShots,
-  getSessionStats,
-  getShootingStats,
-  addNoteToSession,
-  uploadSignature,
-  uploadPhotos,
-  exportSessionsToCSV,
-  exportSessionsToPDF,
-  getWeapons,
-  addWeapon,
-};
+// Response interceptor to handle token expiration or invalid tokens
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // If the error status is 401 (Unauthorized) and it's not a login attempt itself,
+    // it might mean the token is expired or invalid.
+    if (error.response && error.response.status === 401 && !error.config.url.includes('/api/auth/login')) {
+      // You might want to automatically log out the user here
+      // import authService from './authService'; // You'd need to import it here
+      // authService.logout();
+      // router.push('/login'); // Redirect to login
+      console.error('Unauthorized API request. Token might be expired or invalid.');
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;

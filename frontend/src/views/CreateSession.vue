@@ -1,44 +1,28 @@
 <template>
-    <div>
-      <h2 class="text-2xl font-bold mb-4">{{ isEditing ? 'Edit' : 'Create' }} Session</h2>
-      <SessionForm
-        :session="sessionToEdit"
-        @submit="handleSubmit"
-        @cancel="cancelForm"
-      />
+  <div class="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] px-4">
+    <SessionForm @session-saved="handleSessionSaved" />
+    <div v-if="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-6 w-full max-w-xl" role="alert">
+      <span class="block sm:inline">{{ successMessage }}</span>
     </div>
-  </template>
-  
-  <script>
-  import { ref } from 'vue';
-  import SessionForm from '@/components/SessionForm.vue';
-  import { useSessions } from '@/composables/useSessions';
-  
-  export default {
-    components: { SessionForm },
-    setup() {
-      const { createSession, updateSession } = useSessions();
-      const isEditing = ref(false);
-      const sessionToEdit = ref(null);
-  
-      const handleSubmit = async (formData) => {
-        try {
-          if (isEditing.value) {
-            await updateSession(sessionToEdit.value.id, formData);
-          } else {
-            await createSession(formData);
-          }
-          // Handle success (e.g., show message, refresh list)
-        } catch (error) {
-          // Handle error
-        }
-      };
-  
-      const cancelForm = () => {
-        // Reset form or close modal
-      };
-  
-      return { isEditing, sessionToEdit, handleSubmit, cancelForm };
-    }
-  }
-  </script>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import SessionForm from '../components/SessionForm.vue'; // Import the SessionForm component
+
+const router = useRouter();
+const successMessage = ref('');
+
+const handleSessionSaved = (session) => {
+  successMessage.value = `Session logged successfully! Redirecting to sessions list...`;
+  setTimeout(() => {
+    router.push('/sessions'); // Redirect to sessions list after a short delay
+  }, 2000); // 2-second delay
+};
+</script>
+
+<style scoped>
+/* Scoped styles for this component */
+</style>

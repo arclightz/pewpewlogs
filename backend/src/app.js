@@ -1,151 +1,43 @@
-console.log(`Current directory: ${process.cwd()}`);
-require("dotenv").config();
-const { kindeClient } = require('./middleware/auth');
-const { isAuthenticated } = require('./middleware/isAuthenticated');
-const createError = require("http-errors");
-const express = require("express");
-const session = require("express-session");
+// backend/src/app.js
+
+const express = require('express');
 const cors = require('cors');
+const connectDB = require('./config/database'); // Import your database connection function
+const authRoutes = require('./routes/auth'); // Import your new authentication routes
+
 const app = express();
 
-const path = require("path");
-const cookieParser = require("cookie-parser");
-const logger = require("morgan");
+// Connect to Database
+// Note: The actual connection execution is typically done in the server.js file
+// to ensure the application doesn't start listening until the DB is ready.
+// This import is just making the function available.
 
-// Routers
-const usersRouter = require("./routes/users");
-const sessionRouter = require("./routes/sessions"); 
-const statsRouter = require("./routes/stats");
-const weaponsRouter = require("./routes/weapons");
-const tokenRoutes = require('./routes/token');
+// Init Middleware
+// express.json() middleware parses incoming requests with JSON payloads.
+// It's essential for handling data sent from your frontend forms (e.g., login, register).
+app.use(express.json({ extended: false }));
 
-// Database initialization not needed here?
-const { connectDB } = require("./config/database");
+// cors() middleware enables Cross-Origin Resource Sharing.
+// This is necessary for your frontend (running on a different port/domain)
+// to make requests to your backend. For production, you should configure
+// CORS to allow requests only from your frontend's domain.
+app.use(cors());
 
-connectDB().then(() => {
-  console.log('Connected to database');
-}).catch(err => {
-  console.error('Database connection failed', err);
-  process.exit(1);
-});
-// Middleware to initialize Kinde client
-app.use((req, res, next) => {
-  req.kindeClient = kindeClient;
-  next();
-});
-console.log(Object.keys(kindeClient));
-// Kinde login route
+// Define Routes
+// Mount your authentication routes under the /api/auth path.
+app.use('/api/auth', authRoutes);
 
-app.get("/login", kindeClient.login(), (req, res) => {
-  return res.redirect("/");
-});
+// Mount your other application-specific routes.
+// Ensure these files exist and export an Express Router.
 
-app.get("/register", kindeClient.register(), (req, res) => {
-  return res.redirect("/");
-});
+// Basic route for testing if the API is running
+app.get('/', (req, res) => res.send('API Running'));
 
-app.get("/callback", kindeClient.callback(), (req, res) => {
-  try {
-    return res.redirect("/");
-  } catch (error) {
-    console.error("Error in Kinde callback:", error);
-    return res.status(500).send("Authentication failed");
-    }
-});
-
-
-// Kinde logout route
-app.get('/logout', (req, res) => {
-  res.clearCookie('kinde_token');
-  res.redirect(req.kindeClient.getLogoutUrl());
-});
-
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
-// configure the server to include the correct CORS headers
-app.use(cors({ 
-  origin: 'https://pew.mrdj.stream', 
-  credentials: true 
-})); 
-app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true }, // True if using HTTPS
-  }),
-);
-
-app.use("/api/users", usersRouter);
-app.use("/api/sessions", sessionRouter);
-app.use("/api/stats", statsRouter);
-app.use("/api/weapons", weaponsRouter);
-
-// For token retrieval
-app.use('/api/token', tokenRoutes);
-
-// Debug route for auth debugging
-app.get('/debug-auth', async (req, res) => {
-  console.log('Debug: All Headers:', req.headers);
-  console.log('Debug: Authorization Header:', req.headers.authorization);
-  
-  try {
-    const isAuthenticated = await kindeClient.isAuthenticated(req);
-    console.log('Debug: isAuthenticated:', isAuthenticated);
-    
-    if (isAuthenticated) {
-      const userDetails = await kindeClient.getUserDetails(req);
-      console.log('Debug: User Details:', userDetails);
-      res.json({ isAuthenticated, userDetails });
-    } else {
-      res.json({ isAuthenticated, message: 'User is not authenticated' });
-    }
-  } catch (error) {
-    console.error('Debug: Authentication Error:', error);
-    res.status(500).json({ error: 'Authentication check failed' });
-  }
-});
-
-// DEBUG: Route to check session state
-app.get('/session-check', (req, res) => {
-  res.json({
-    sessionExists: !!req.session,
-    tokenSetExists: !!req.session.tokenSet,
-    sessionContent: req.session
-  });
-});
-
-
-// Error handler for JWT authentication
+// Global error handling middleware (optional, but highly recommended)
+// This catches unhandled errors from your routes and sends a generic 500 response.
 app.use((err, req, res, next) => {
-  if (err.name === 'UnauthorizedError') {
-    res.status(401).json({ message: 'Invalid token' });
-  } else {
-    next(err);
-  }
+    console.error('Unhandled server error:', err.stack); // Log the error stack for debugging
+    res.status(500).send('Something broke on the server!');
 });
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render("error");
-});
-
-module.exports = app;
+module.exports = app; // Export the Express app instance for use in server.js

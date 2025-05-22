@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install bash and mysql-client
-RUN apk update && apk add bash mysql-client
+RUN apk update && apk add bash
 
 # Install dependencies
 RUN npm install

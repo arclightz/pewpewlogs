@@ -1,18 +1,20 @@
 version: '3.8'
 
 services:
-  mariadb:
-    image: mariadb:10.5
-    container_name: mariadb
+  mongodb:
+    image: mongo:4.4 # Using a recent stable MongoDB image
+    container_name: mongodb
     ports:
-      - "3306:3306"
+      - "27017:27017" # Expose MongoDB port for local access/tools
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USERNAME}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      # Optional: Define root user and password for MongoDB.
+      # It's good practice to use environment variables from your .env file for these.
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-rootpassword}
+      # Define a default database that will be created on startup
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-pewpewlogs}
     volumes:
-      - mariadb-data:/var/lib/mysql
+      - mongodb_data:/data/db # Persist MongoDB data
     networks:
       - web
 
@@ -20,7 +22,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: pewpewlogs
+    container_name: pewpewlogs_backend
     networks:
       - web
     ports:
@@ -38,8 +40,15 @@ services:
       - "traefik.http.services.pewpewlogs.loadBalancer.server.port=3000"
     env_file:
       - .env
+    environment:
+      # **IMPORTANT:** Update your backend's database connection string to point to MongoDB
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-root}:${MONGO_ROOT_PASSWORD:-rootpassword}@mongodb:27017/${MONGODB_DATABASE:-pewpewlogs}?authSource=admin
+      # You might also want to explicitly pass root credentials if your Node.js app uses them,
+      # though it's more common to create a dedicated app user in MongoDB.
+      # MONGODB_USERNAME: ${MONGO_ROOT_USERNAME:-root}
+      # MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD:-rootpassword}
     depends_on:
-      - mariadb
+      - mongodb
     volumes:
       - ./backend:/usr/src/app
     command: "npm run dev"
@@ -78,4 +87,4 @@ networks:
     external: true
 
 volumes:
-  mariadb-data:
+  mongodb_data: # Define the new volume for MongoDB data

@@ -1,103 +1,49 @@
 <template>
-  <div class="weapon-list p-4 bg-gray-100 min-h-screen">
-    <h1 class="text-2xl font-bold mb-4 text-gray-800">Your Weapons</h1>
-    <button @click="showNewWeaponForm = true" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-600">Add New Weapon</button>
-    <div v-if="loading" class="text-gray-600">Loading weapons...</div>
-    <div v-else-if="error" class="text-red-500">Error loading weapons: {{ error }}</div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div v-for="weapon in weapons" :key="weapon.id" class="bg-white p-4 rounded shadow">
-        <h3 class="text-lg font-semibold text-gray-800">{{ weapon.name }}</h3>
-        <div class="text-gray-600">Type: {{ weapon.type }}</div>
-        <div class="text-gray-600">Caliber: {{ weapon.caliber }}</div>
-        <div class="mt-2">
-          <button @click="handleEditWeapon(weapon)" class="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600">Edit</button>
-          <button @click="handleDeleteWeapon(weapon.id)" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
+  <div class="container mx-auto px-4 py-8 text-white">
+    <h1 class="text-3xl font-bold mb-6 text-center">Your Weapons</h1>
+
+    <div v-if="loading" class="text-center text-lg">Loading weapons...</div>
+    <div v-else-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+      <span class="block sm:inline">{{ error }}</span>
+    </div>
+    <div v-else-if="weapons.length === 0" class="text-center text-lg text-blue-200">
+      <p>No weapons registered yet.</p>
+      <router-link to="/weapons/new" class="text-blue-400 hover:underline mt-4 block">Add your first weapon!</router-link>
+    </div>
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-for="weapon in weapons" :key="weapon._id" class="bg-blue-800 p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-2">{{ weapon.name }}</h3>
+        <p class="text-blue-200">Type: {{ weapon.type || 'N/A' }}</p>
+        <div class="mt-4 flex justify-end">
+          <!-- <button class="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm">
+            Edit
+          </button> -->
         </div>
       </div>
     </div>
-    <div v-if="showNewWeaponForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div class="bg-white p-6 rounded-lg w-full max-w-md">
-        <h2 class="text-xl font-bold mb-4 text-gray-800">{{ editingWeapon ? 'Edit' : 'New' }} Weapon</h2>
-        <WeaponForm 
-          :weapon="editingWeapon"
-          @submit="editingWeapon ? handleUpdateWeapon : handleCreateWeapon"
-          @cancel="closeForm"
-        />
-      </div>
+
+    <div class="mt-8 text-center">
+      <router-link
+        to="/weapons/new"
+        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+      >
+        Add New Weapon
+      </router-link>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useWeapons } from '../composables/useWeapons';
-import WeaponForm from '../components/WeaponForm.vue';
-import { getUser } from '../services/kinde'; // Ensure user is authenticated
+import { onMounted } from 'vue';
+import { useWeapons } from '../composables/useWeapons'; // Import the weapon composable
 
-const { getWeapons, createWeapon, updateWeapon, deleteWeapon } = useWeapons();
-const weapons = ref([]);
-const loading = ref(true);
-const error = ref(null);
-const showNewWeaponForm = ref(false);
-const editingWeapon = ref(null);
+const { weapons, loading, error, fetchWeapons } = useWeapons();
 
-onMounted(async () => {
-  try {
-    const user = await getUser();
-    if (!user) {
-      throw new Error('User not authenticated');
-    }
-    weapons.value = await getWeapons();
-  } catch (e) {
-    error.value = e.message;
-  } finally {
-    loading.value = false;
-  }
+onMounted(() => {
+  fetchWeapons(); // Fetch weapons when the component is mounted
 });
-
-const handleCreateWeapon = async (weaponData) => {
-  try {
-    await createWeapon(weaponData);
-    weapons.value = await getWeapons();
-    showNewWeaponForm.value = false;
-  } catch (e) {
-    error.value = e.message;
-  }
-};
-
-const handleEditWeapon = (weapon) => {
-  editingWeapon.value = weapon;
-  showNewWeaponForm.value = true;
-};
-
-const handleUpdateWeapon = async (weaponData) => {
-  try {
-    await updateWeapon(editingWeapon.value.id, weaponData);
-    weapons.value = await getWeapons();
-    showNewWeaponForm.value = false;
-    editingWeapon.value = null;
-  } catch (e) {
-    error.value = e.message;
-  }
-};
-
-const handleDeleteWeapon = async (weaponId) => {
-  if (confirm('Are you sure you want to delete this weapon?')) {
-    try {
-      await deleteWeapon(weaponId);
-      weapons.value = weapons.value.filter(w => w.id !== weaponId);
-    } catch (e) {
-      error.value = e.message;
-    }
-  }
-};
-
-const closeForm = () => {
-  showNewWeaponForm.value = false;
-  editingWeapon.value = null;
-};
 </script>
 
 <style scoped>
-/* Add any styles you need for the WeaponList component */
+/* Scoped styles for this component */
 </style>

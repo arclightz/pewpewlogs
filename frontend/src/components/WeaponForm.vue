@@ -1,99 +1,98 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-4">
-    <div v-for="field in formFields" :key="field.id">
-      <label :for="field.id" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+  <form @submit.prevent="handleSubmit" class="bg-blue-800 p-8 rounded-lg shadow-xl w-full max-w-xl text-white">
+    <h2 class="text-2xl font-bold mb-6 text-center">{{ isEdit ? 'Edit Weapon' : 'Add New Weapon' }}</h2>
+
+    <div class="mb-4">
+      <label for="name" class="block text-blue-200 text-sm font-bold mb-2">Weapon Name:</label>
       <input
-        v-if="field.type !== 'textarea'"
-        :type="field.type"
-        :id="field.id"
-        v-model="form[field.id]"
-        :required="field.required"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
-      >
-      <textarea
-        v-else
-        :id="field.id"
-        v-model="form[field.id]"
-        rows="3"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
-      ></textarea>
+        type="text"
+        id="name"
+        v-model="weaponForm.name"
+        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+        placeholder="e.g., Glock 19, AR-15"
+        required
+      />
     </div>
 
-    <div class="flex justify-end space-x-3">
-      <button
-        type="button"
-        @click="$emit('cancel')"
-        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        :disabled="isSubmitting"
-      >
-        Cancel
-      </button>
+    <div class="mb-6">
+      <label for="type" class="block text-blue-200 text-sm font-bold mb-2">Weapon Type:</label>
+      <input
+        type="text"
+        id="type"
+        v-model="weaponForm.type"
+        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+        placeholder="e.g., Pistol, Rifle, Shotgun"
+      />
+    </div>
+
+    <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+      <span class="block sm:inline">{{ errorMessage }}</span>
+    </div>
+
+    <div class="flex items-center justify-between">
       <button
         type="submit"
-        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        :disabled="isSubmitting"
+        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+        :disabled="loading"
       >
-        {{ isSubmitting ? 'Submitting...' : (weapon ? 'Update' : 'Create') + ' Weapon' }}
+        {{ loading ? 'Saving...' : (isEdit ? 'Update Weapon' : 'Add Weapon') }}
       </button>
-    </div>
-    
-    <div v-if="errorMessage" class="text-red-500 text-sm mt-2">
-      {{ errorMessage }}
     </div>
   </form>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, defineProps, defineEmits, watch } from 'vue';
+import { useWeapons } from '../composables/useWeapons';
 
 const props = defineProps({
-  weapon: {
+  initialWeapon: {
     type: Object,
-    default: null
-  }
+    default: null, // For editing an existing weapon
+  },
+  isEdit: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(['submit', 'cancel']);
+const emit = defineEmits(['weapon-saved']);
 
-const formFields = [
-  { id: 'name', label: 'Name', type: 'text', required: true },
-  { id: 'type', label: 'Type', type: 'text', required: true },
-  { id: 'caliber', label: 'Caliber', type: 'text', required: false },
-  { id: 'erva', label: 'ERVA', type: 'text', required: false },
-  { id: 'purchaseDate', label: 'Purchase Date', type: 'date', required: false },
-  { id: 'notes', label: 'Notes', type: 'textarea', required: false },
-];
+const { createWeapon, loading, error } = useWeapons();
 
-const form = ref({
+const weaponForm = ref({
   name: '',
   type: '',
-  caliber: '',
-  erva: '',
-  purchaseDate: '',
-  notes: ''
+  // Add other MVP fields here
 });
 
 const errorMessage = ref('');
-const isSubmitting = ref(false);
 
-onMounted(() => {
-  if (props.weapon) {
-    form.value = { ...props.weapon };
+// Watch for changes in initialWeapon if it's loaded asynchronously
+watch(() => props.initialWeapon, (newVal) => {
+  if (props.isEdit && newVal) {
+    weaponForm.value = { ...newVal };
   }
-});
+}, { immediate: true });
 
 const handleSubmit = async () => {
   errorMessage.value = '';
-  isSubmitting.value = true;
   try {
-    if (!form.value.name || !form.value.type) {
-      throw new Error('Please fill in all required fields.');
-    }
-    emit('submit', form.value);
-  } catch (error) {
-    errorMessage.value = error.message || 'An error occurred. Please try again.';
-  } finally {
-    isSubmitting.value = false;
+    // For MVP, we're only implementing create.
+    // If isEdit is true, you'd call an updateWeapon function here.
+    const savedWeapon = await createWeapon(weaponForm.value);
+    emit('weapon-saved', savedWeapon); // Emit event to parent
+    // Reset form after successful submission
+    weaponForm.value = {
+      name: '',
+      type: '',
+    };
+  } catch (err) {
+    errorMessage.value = err.message || 'Failed to save weapon.';
   }
 };
 </script>
+
+<style scoped>
+/* Scoped styles for this component */
+</style>

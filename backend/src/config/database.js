@@ -1,22 +1,26 @@
-const { Sequelize } = require('sequelize');
-const config = require('./databaseConfig');
+// This file is responsible for connecting to the MongoDB database.
+// backend/src/config/database.js
+const mongoose = require('mongoose');
 
-const sequelize = new Sequelize(config.db.database, config.db.user, config.db.password, {
-  host: config.db.host,
-  dialect: config.db.type,
-  port: config.db.port,
-  logging: console.log // Set to console.log to see the SQL queries
-});
+// Replace with your MongoDB connection string.
+// For local MongoDB: 'mongodb://localhost:27017/pewpewlogs'
+// For MongoDB Atlas: 'mongodb+srv://<username>:<password>@<cluster-name>.mongodb.net/pewpewlogs?retryWrites=true&w=majority'
+const dbURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/pewpewlogs';
 
 const connectDB = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Connected to MariaDB');
-    await sequelize.sync(); // This will create tables if they don't exist
-    console.log('Database synchronized');
-  } catch (err) {
-    console.error('Error connecting to MariaDB:', err.message);
-  }
+    try {
+        await mongoose.connect(dbURI, {
+            // useNewUrlParser: true, // Deprecated in Mongoose 6+
+            // useUnifiedTopology: true, // Deprecated in Mongoose 6+
+            // useCreateIndex: true, // Deprecated in Mongoose 6+
+            // useFindAndModify: false // Deprecated in Mongoose 6+
+        });
+        console.log('MongoDB Connected...');
+    } catch (err) {
+        console.error(err.message);
+        // Exit process with failure
+        process.exit(1);
+    }
 };
 
-module.exports = { sequelize, connectDB };
+module.exports = connectDB;

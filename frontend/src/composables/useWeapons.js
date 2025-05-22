@@ -1,60 +1,53 @@
-import api from '../services/api.js';
+// frontend/src/composables/useWeapons.js
+import { ref } from 'vue';
+import api from '../services/api'; // Import the configured axios instance
+import { useApi } from './useApi'; // Import the general useApi composable
 
+/**
+ * A Vue composable for managing weapons.
+ * Provides functions to fetch, create, and potentially update/delete weapons.
+ */
 export function useWeapons() {
-  const getWeapons = async () => {
+  const weapons = ref([]); // Reactive array to store weapons
+  const { data, loading, error, execute } = useApi(); // Use the general API composable
+
+  /**
+   * Fetches all weapons for the authenticated user.
+   */
+  const fetchWeapons = async () => {
     try {
-      const response = await api.getWeapons();
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching weapons:', error);
-      throw error;
+      const responseData = await execute(api.get, '/api/weapons');
+      weapons.value = responseData; // Assuming API returns an array of weapons directly
+    } catch (err) {
+      console.error('Failed to fetch weapons:', err);
+      // Error state is already handled by useApi, but specific handling can go here
     }
   };
 
-  const getWeapon = async (weaponId) => {
-    try {
-      const response = await api.get(`/weapons/${weaponId}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching weapon:', error);
-      throw error;
-    }
-  };
-
+  /**
+   * Creates a new weapon.
+   * @param {Object} weaponData - The data for the new weapon (e.g., name, type).
+   * @returns {Promise<Object>} The created weapon object.
+   */
   const createWeapon = async (weaponData) => {
     try {
-      const response = await api.addWeapon(weaponData);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating weapon:', error);
-      throw error;
+      const newWeapon = await execute(api.post, '/api/weapons', weaponData);
+      weapons.value.push(newWeapon); // Add the new weapon to the local list
+      return newWeapon;
+    } catch (err) {
+      console.error('Failed to create weapon:', err);
+      throw err; // Re-throw for component to handle
     }
   };
 
-  const updateWeapon = async (weaponId, weaponData) => {
-    try {
-      const response = await api.put(`/weapons/${weaponId}`, weaponData);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating weapon:', error);
-      throw error;
-    }
-  };
-
-  const deleteWeapon = async (weaponId) => {
-    try {
-      await api.delete(`/weapons/${weaponId}`);
-    } catch (error) {
-      console.error('Error deleting weapon:', error);
-      throw error;
-    }
-  };
+  // You can add more functions here for updating, deleting, or fetching a single weapon.
 
   return {
-    getWeapons,
-    getWeapon,
+    weapons,
+    loading,
+    error,
+    fetchWeapons,
     createWeapon,
-    updateWeapon,
-    deleteWeapon,
+    // ... other weapon-related functions
   };
 }
