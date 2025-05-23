@@ -13,7 +13,7 @@
             class="block w-full rounded-lg border border-gray-600 px-5 py-3 leading-6 placeholder-gray-400 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 bg-gray-700 text-gray-100"
             required
           />
-        </div>
+        </div> 
 
         <div class="space-y-1">
           <label for="range" class="inline-block text-sm font-medium">Ampumarata:</label>
@@ -173,7 +173,7 @@ import { ref, onMounted, defineProps, defineEmits, watch } from 'vue';
 import { useSessions } from '../composables/useSessions';
 import { useWeapons } from '../composables/useWeapons';
 import { useApi } from '../composables/useApi';
-import api from '../services/api'; // IMPORTANT: Import 'api'
+import api from '../services/api';
 // Removed direct axios import here as it's not used for Nominatim in this component
 // import axios from 'axios';
 
@@ -216,13 +216,9 @@ const errorMessage = ref('');
 const fetchRanges = async () => {
   rangesLoading.value = true;
   try {
-    const responseData = await execute(api.get, '/api/ranges'); // FIX: Changed axios.get to api.get
-    // FIX: Map responseData to only include _id and name
-    ranges.value = responseData.map(range => ({
-      _id: range._id,
-      name: range.name
-    }));
-    console.log("[SessionForm] Fetched ranges:", ranges.value); // Added console.log here
+    const responseData = await execute(api.get, '/api/ranges');
+    ranges.value = responseData; // Corrected line
+    console.log("[SessionForm] Fetched ranges:", ranges.value);
   } catch (err) {
     console.error('Virhe ampumaratojen latauksessa:', err);
     rangesError.value = err.message || 'Ampumaratojen lataaminen epäonnistui.';
@@ -243,6 +239,19 @@ onMounted(() => {
     };
   }
 });
+
+watch(() => sessionForm.value.weaponId, (newWeaponId) => {
+  if (newWeaponId) {
+    const selectedWeapon = weapons.value.find(w => w._id === newWeaponId);
+    if (selectedWeapon && selectedWeapon.caliber) {
+      sessionForm.value.ammunitionType = selectedWeapon.caliber;
+    } else {
+      sessionForm.value.ammunitionType = ''; // Clear if no caliber or weapon not found
+    }
+  } else {
+    sessionForm.value.ammunitionType = ''; // Clear if no weapon selected
+  }
+}, { immediate: true });
 
 watch(() => props.initialSession, (newVal) => {
   if (props.isEdit && newVal) {

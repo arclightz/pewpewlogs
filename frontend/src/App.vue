@@ -4,7 +4,7 @@
 
     <div
       :class="{
-        'ml-64': !isMobile, // Desktop: Always push content by sidebar's width
+        'ml-0': !isMobile, // Desktop: Always push content by sidebar's width
         'ml-0': isMobile    // Mobile: No sidebar, no push
       }"
       class="flex-1 flex flex-col transition-all duration-300 ease-in-out"
@@ -23,8 +23,6 @@
 
 <script setup>
 import { ref, onMounted, computed, onBeforeUnmount } from 'vue';
-// TopNavBar is removed
-// import TopNavBar from './components/TopNavBar.vue';
 import SideBar from './components/SideBar.vue';
 import BottomNavBar from './components/BottomNavBar.vue';
 import state from './services/state';
@@ -34,8 +32,6 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const user = ref(null);
 const isLoading = ref(true);
-// isSidebarOpen state is no longer needed as sidebar is static
-// const isSidebarOpen = ref(true);
 const isMobile = ref(false);
 
 const isAuthenticated = computed(() => {
@@ -74,14 +70,6 @@ const checkAuthentication = async () => {
     console.log("[App.vue] checkAuthentication finished. isLoading set to false.");
   }
 };
-
-// Sidebar toggle/close functions are no longer needed
-// const toggleSidebar = () => {
-//   isSidebarOpen.value = !isSidebarOpen.value;
-// };
-// const closeSidebar = () => {
-//   isSidebarOpen.value = false;
-// };
 
 onMounted(async () => {
   console.log("[App.vue] Component mounted. Starting authentication check.");

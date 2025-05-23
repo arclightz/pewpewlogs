@@ -1,6 +1,6 @@
 <template>
   <div class="px-4 py-8 w-full min-h-screen">
-    <h1 class="text-3xl font-bold mb-6 text-center">Ampumatilastosi</h1>
+    <h1 class="text-3xl font-bold mb-6 text-left">Ampumatilastosi</h1>
 
     <div v-if="loading" class="text-center text-lg text-gray-300">Ladataan tilastoja...</div>
     <div v-else-if="error" class="bg-red-800 text-white px-4 py-3 rounded relative mb-4" role="alert">

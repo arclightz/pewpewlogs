@@ -1,6 +1,7 @@
 // backend/src/controllers/sessionController.js
-const Session = require('../models/sessions'); // Import the Session model
-const Weapon = require('../models/weapons'); // Import the Weapon model (to validate weaponId)
+const Session = require('../models/sessions');
+const Weapon = require('../models/weapons');
+const ShootingRange = require('../models/shootingRanges'); // Import ShootingRange model
 
 /**
  * @desc Create a new shooting session
@@ -9,24 +10,29 @@ const Weapon = require('../models/weapons'); // Import the Weapon model (to vali
  */
 exports.createSession = async (req, res) => {
   try {
-    const { date, location, weaponId, ammunitionType, ammunitionCount, numberOfShotsFired, distanceToTarget, hits, misses, notes } = req.body;
+    const { date, range, weaponId, ammunitionType, ammunitionCount, numberOfShotsFired, distanceToTarget, hits, misses, notes } = req.body;
 
-    // Basic validation
-    if (!date || !location || !weaponId) {
-      return res.status(400).json({ message: 'Date, location, and weapon are required for a session.' });
+    if (!date || !range || !weaponId) {
+      return res.status(400).json({ message: 'Päivämäärä, ampumarata ja ase vaaditaan istunnolle.' });
     }
 
-    // Verify if the weaponId belongs to the authenticated user
+    // Verify if the weaponId belongs to the authenticated user (STILL REQUIRED)
     const weapon = await Weapon.findOne({ _id: weaponId, userId: req.user.id });
     if (!weapon) {
-      return res.status(404).json({ message: 'Weapon not found or does not belong to this user.' });
+      return res.status(404).json({ message: 'Asetta ei löytynyt tai se ei kuulu käyttäjälle.' });
+    }
+
+    // FIX: Only verify that the range EXISTS, not that it belongs to the user
+    const shootingRange = await ShootingRange.findById(range); // Removed userId filter
+    if (!shootingRange) {
+      return res.status(404).json({ message: 'Ampumarataa ei löytynyt.' }); // Shooting range not found
     }
 
     const newSession = new Session({
-      userId: req.user.id, // Assign the session to the authenticated user
+      userId: req.user.id,
       date,
-      location,
-      weapon: weaponId, // Store the weapon's ObjectId
+      range,
+      weapon: weaponId,
       ammunitionType,
       ammunitionCount,
       numberOfShotsFired,
@@ -38,17 +44,18 @@ exports.createSession = async (req, res) => {
 
     const savedSession = await newSession.save();
 
-    // Optionally, populate the weapon details for the response
-    const populatedSession = await Session.findById(savedSession._id).populate('weapon', 'name type');
+    const populatedSession = await Session.findById(savedSession._id)
+                                         .populate('weapon', 'name type')
+                                         .populate('range', 'name address');
 
-    res.status(201).json(populatedSession); // Respond with the created session
+    res.status(201).json(populatedSession);
   } catch (err) {
-    console.error('Error creating session:', err.message);
+    console.error('Virhe istunnon luomisessa:', err.message);
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map(val => val.message);
       return res.status(400).json({ message: messages.join(', ') });
     }
-    res.status(500).json({ message: 'Server error during session creation.' });
+    res.status(500).json({ message: 'Palvelinvirhe istunnon luomisessa.' });
   }
 };
 
@@ -59,18 +66,15 @@ exports.createSession = async (req, res) => {
  */
 exports.getSessions = async (req, res) => {
   try {
-    // Find all sessions belonging to the authenticated user
-    // Populate the 'weapon' field to get weapon details (name, type)
     const sessions = await Session.find({ userId: req.user.id })
-      .populate('weapon', 'name type') // Select only name and type from the weapon
-      .sort({ date: -1 }) // Sort by date in descending order (latest first)
-      .lean(); // Use .lean() for faster query results if not needing Mongoose document methods
+      .populate('weapon', 'name type')
+      .populate('range', 'name address')
+      .sort({ date: -1 })
+      .lean();
 
     res.json(sessions);
   } catch (err) {
-    console.error('Error fetching sessions:', err.message);
-    res.status(500).json({ message: 'Server error during session retrieval.' });
+    console.error('Virhe istuntojen hakemisessa:', err.message);
+    res.status(500).json({ message: 'Palvelinvirhe istuntojen hakemisessa.' });
   }
 };
-
-// You can add more functions here for updating, deleting, or getting a single session by ID.

@@ -11,18 +11,17 @@ exports.createRange = async (req, res) => {
   try {
     const { name, address, latitude, longitude, notes, website, phoneNumber } = req.body;
 
-    // Basic validation
     if (!name || !address || latitude === undefined || longitude === undefined) {
-      return res.status(400).json({ message: 'Nimi, osoite ja sijainti (leveys- ja pituusaste) vaaditaan.' }); // Name, address, and location (lat/lng) are required.
+      return res.status(400).json({ message: 'Nimi, osoite ja sijainti (leveys- ja pituusaste) vaaditaan.' });
     }
 
     const newRange = new ShootingRange({
-      userId: req.user.id, // Link range to the authenticated user
+      userId: req.user.id, // Still link to the user who created it
       name,
       address,
       location: {
         type: 'Point',
-        coordinates: [longitude, latitude], // GeoJSON stores [longitude, latitude]
+        coordinates: [longitude, latitude],
       },
       notes,
       website,
@@ -30,50 +29,51 @@ exports.createRange = async (req, res) => {
     });
 
     const savedRange = await newRange.save();
-    res.status(201).json(savedRange); // Respond with the created range
+    res.status(201).json(savedRange);
   } catch (err) {
-    console.error('Virhe ampumaradan luomisessa:', err.message); // Error creating shooting range
+    console.error('Virhe ampumaradan luomisessa:', err.message);
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map(val => val.message);
       return res.status(400).json({ message: messages.join(', ') });
     }
-    res.status(500).json({ message: 'Palvelinvirhe ampumaradan luomisessa.' }); // Server error during range creation
+    res.status(500).json({ message: 'Palvelinvirhe ampumaradan luomisessa.' });
   }
 };
 
 /**
- * @desc Get all shooting ranges for the authenticated user
+ * @desc Get all shooting ranges (for any authenticated user)
  * @route GET /api/ranges
  * @access Private (requires authentication)
  */
 exports.getRanges = async (req, res) => {
   try {
-    // Find all ranges belonging to the authenticated user
-    const ranges = await ShootingRange.find({ userId: req.user.id }).lean();
+    // FIX: Removed userId filter. All authenticated users can see all ranges.
+    const ranges = await ShootingRange.find({}).lean(); // No filter by userId
     res.json(ranges);
   } catch (err) {
-    console.error('Virhe ampumaratojen hakemisessa:', err.message); // Error fetching shooting ranges
-    res.status(500).json({ message: 'Palvelinvirhe ampumaratojen hakemisessa.' }); // Server error during range retrieval
+    console.error('Virhe ampumaratojen hakemisessa:', err.message);
+    res.status(500).json({ message: 'Palvelinvirhe ampumaratojen hakemisessa.' });
   }
 };
 
 /**
- * @desc Get a single shooting range by ID
+ * @desc Get a single shooting range by ID (for any authenticated user)
  * @route GET /api/ranges/:id
  * @access Private
  */
 exports.getRangeById = async (req, res) => {
   try {
-    const range = await ShootingRange.findOne({ _id: req.params.id, userId: req.user.id });
+    // FIX: Removed userId filter. Any authenticated user can get a range by ID.
+    const range = await ShootingRange.findById(req.params.id);
     if (!range) {
-      return res.status(404).json({ message: 'Ampumarataa ei löytynyt tai se ei kuulu käyttäjälle.' }); // Shooting range not found or does not belong to user
+      return res.status(404).json({ message: 'Ampumarataa ei löytynyt.' }); // Range not found
     }
     res.json(range);
   } catch (err) {
-    console.error('Virhe yksittäisen ampumaradan hakemisessa:', err.message); // Error fetching single shooting range
+    console.error('Virhe yksittäisen ampumaradan hakemisessa:', err.message);
     if (err.name === 'CastError') {
-      return res.status(400).json({ message: 'Virheellinen ampumaradan ID-muoto.' }); // Invalid range ID format
+      return res.status(400).json({ message: 'Virheellinen ampumaradan ID-muoto.' });
     }
-    res.status(500).json({ message: 'Palvelinvirhe ampumaradan hakemisessa.' }); // Server error during range retrieval
+    res.status(500).json({ message: 'Palvelinvirhe ampumaradan hakemisessa.' });
   }
 };

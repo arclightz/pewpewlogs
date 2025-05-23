@@ -4,7 +4,7 @@
   >
     <div class="flex items-center justify-center mb-8 h-12">
       <router-link to="/" class="text-white text-2xl font-bold">
-        <svg width="50" height="50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="100" height="100" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="200" height="200" fill="#1F2937"/>
             <g>
               <circle cx="100" cy="100" r="60" stroke="#3B82F6" stroke-width="6"/>

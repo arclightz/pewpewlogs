@@ -17,7 +17,7 @@ export function useWeapons() {
   const fetchWeapons = async () => {
     try {
       const responseData = await execute(api.get, '/api/weapons');
-      weapons.value = responseData; // Assuming API returns an array of weapons directly
+      weapons.value = responseData; // Store the full responseData directly
     } catch (err) {
       console.error('Failed to fetch weapons:', err);
       // Error state is already handled by useApi, but specific handling can go here
