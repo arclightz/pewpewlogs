@@ -1,54 +1,111 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-blue-900">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-gray-800">
-      <h2 class="text-2xl font-bold mb-6 text-center">Login to Pewpewlogs</h2>
-
-      <form @submit.prevent="handleLogin">
-        <div class="mb-4">
-          <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-          <input
-            type="email"
-            id="email"
-            v-model="email"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            required
-          />
-        </div>
-        <div class="mb-6">
-          <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-          <input
-            type="password"
-            id="password"
-            v-model="password"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-            required
-          />
-        </div>
-        <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-          <span class="block sm:inline">{{ errorMessage }}</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <button
-            type="submit"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-            :disabled="isLoggingIn"
+  <div
+    id="page-container"
+    class="mx-auto flex min-h-screen w-full min-w-80 flex-col bg-gray-900 text-gray-100"
+  >
+    <main id="page-content" class="flex max-w-full flex-auto flex-col">
+      <div
+        class="relative mx-auto flex min-h-screen w-full max-w-10xl items-center justify-center overflow-hidden p-4 lg:p-8"
+      >
+        <section class="w-full max-w-xl py-6">
+          <header class="mb-10 text-center">
+            <h1 class="mb-2 inline-flex items-center gap-2 text-2xl font-bold">
+              <svg
+                class="hi-mini hi-cube-transparent inline-block size-5 text-blue-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path fill-rule="evenodd" d="M9.638 1.093a.75.75 0 01.724 0l2 1.104a.75.75 0 11-.724 1.313L10 2.607l-1.638.903a.75.75 0 11-.724-1.313l2-1.104zM5.403 4.287a.75.75 0 01-.295 1.019l-.805.444.805.444a.75.75 0 01-.724 1.314L3.5 7.02v.73a.75.75 0 01-1.5 0v-2a.75.75 0 01.388-.657l1.996-1.1a.75.75 0 011.019.294zm9.194 0a.75.75 0 011.02-.295l1.995 1.101A.75.75 0 0118 5.75v2a.75.75 0 01-1.5 0v-.73l-.884.488a.75.75 0 11-.724-1.314l.806-.444-.806-.444a.75.75 0 01-.295-1.02zM7.343 8.284a.75.75 0 011.02-.294L10 8.893l1.638-.903a.75.75 0 11.724 1.313l-1.612.89v1.557a.75.75 0 01-1.5 0v-1.557l-1.612-.89a.75.75 0 01-.295-1.019zM2.75 11.5a.75.75 0 01.75.75v1.557l1.608.887a.75.75 0 01-.724 1.314l-1.996-1.101A.75.75 0 012 14.25v-2a.75.75 0 01.75-.75zm14.5 0a.75.75 0 01.75.75v2a.75.75 0 01-.388.657l-1.996 1.1a.75.75 0 11-.724-1.313l1.608-.887V12.25a.75.75 0 01.75-.75zm-7.25 4a.75.75 0 01.75.75v.73l.888-.49a.75.75 0 01.724 1.313l-2 1.104a.75.75 0 01-.724 0l-2-1.104a.75.75 0 11.724-1.313l.888.49v-.73a.75.75 0 01.75-.75z" clip-rule="evenodd"/>
+              </svg>
+              <span>Pewpewlogs</span> </h1>
+            <h2 class="text-sm font-medium text-gray-400">
+              Welcome, please sign in to your dashboard
+            </h2>
+          </header>
+          <div
+            class="flex flex-col overflow-hidden rounded-lg bg-gray-800 shadow-xs text-gray-100"
           >
-            {{ isLoggingIn ? 'Logging In...' : 'Login' }}
-          </button>
+            <div class="grow p-5 md:px-16 md:py-12">
+              <form @submit.prevent="handleLogin" class="space-y-6">
+                <div class="space-y-1">
+                  <label for="email" class="inline-block text-sm font-medium">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    v-model="email"
+                    placeholder="Enter your email"
+                    class="block w-full rounded-lg border border-gray-600 px-5 py-3 leading-6 placeholder-gray-400 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 bg-gray-700 text-gray-100"
+                    required
+                  />
+                </div>
+                <div class="space-y-1">
+                  <label for="password" class="inline-block text-sm font-medium">Password</label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    v-model="password"
+                    placeholder="Enter your password"
+                    class="block w-full rounded-lg border border-gray-600 px-5 py-3 leading-6 placeholder-gray-400 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 bg-gray-700 text-gray-100"
+                    required
+                  />
+                </div>
+                <div v-if="errorMessage" class="bg-red-800 text-white px-4 py-3 rounded relative text-sm" role="alert">
+                  {{ errorMessage }}
+                </div>
+                <div>
+                  <button
+                    type="submit"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-blue-700 bg-blue-700 px-6 py-3 leading-6 font-semibold text-white hover:border-blue-600 hover:bg-blue-600 focus:ring-3 focus:ring-blue-400/50 active:border-blue-700 active:bg-blue-700"
+                    :disabled="isLoggingIn"
+                  >
+                    <svg
+                      class="hi-mini hi-arrow-uturn-right inline-block size-5 opacity-50"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M12.207 2.232a.75.75 0 00.025 1.06l4.146 3.958H6.375a5.375 5.375 0 000 10.75H9.25a.75.75 0 000-1.5H6.375a3.875 3.875 0 010-7.75h10.003l-4.146 3.957a.75.75 0 001.036 1.085l5.5-5.25a.75.75 0 000-1.085l-5.5-5.25a.75.75 0 00-1.06.025z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <span>{{ isLoggingIn ? 'Logging In...' : 'Sign In' }}</span>
+                  </button>
+
+                  </div>
+              </form>
+            </div>
+            <div
+              class="grow bg-gray-700 p-5 text-center text-sm"
+            >
+              Don’t have an account yet?
+              <router-link
+                to="/register"
+                class="font-medium text-blue-400 hover:text-blue-300"
+                >Sign up</router-link
+              >
+            </div>
+          </div>
+          <div class="mt-6 text-center text-sm text-gray-400">
+            Powered by
+            <a href="#" class="font-medium text-blue-400 hover:text-blue-300">Pewpewlogs</a>
+          </div>
+          </section>
         </div>
-      </form>
-      <p class="text-center text-gray-600 text-sm mt-4">
-        Don't have an account?
-        <router-link to="/register" class="text-blue-500 hover:text-blue-800">Register here</router-link>
-      </p>
+    </main>
     </div>
-  </div>
-</template>
+  </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import authService from '../services/authService'; // Import the new authService
+import authService from '../services/authService';
 
 const email = ref('');
 const password = ref('');
@@ -57,20 +114,17 @@ const isLoggingIn = ref(false);
 const router = useRouter();
 
 const handleLogin = async () => {
-  errorMessage.value = ''; // Clear previous errors
-  isLoggingIn.value = true; // Set loading state
+  errorMessage.value = '';
+  isLoggingIn.value = true;
 
   try {
     await authService.login(email.value, password.value);
-    router.push('/dashboard'); // Redirect to dashboard on successful login
+    router.push('/dashboard');
   } catch (error) {
     errorMessage.value = error.message || 'An unexpected error occurred during login.';
+    console.error('Login failed:', error); // Keep console log for debugging
   } finally {
-    isLoggingIn.value = false; // Reset loading state
+    isLoggingIn.value = false;
   }
 };
 </script>
-
-<style scoped>
-/* Add any component-specific styles here if needed */
-</style>

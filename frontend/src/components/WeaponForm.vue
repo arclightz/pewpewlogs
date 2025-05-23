@@ -1,87 +1,105 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="bg-blue-800 p-8 rounded-lg shadow-xl w-full max-w-xl text-white">
-    <h2 class="text-2xl font-bold mb-6 text-center">{{ isEdit ? 'Edit Weapon' : 'Add New Weapon' }}</h2>
+  <div class="px-4 py-8 lg:px-8 lg:py-16 w-full min-h-full"> <form @submit.prevent="handleSubmit" class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-xl mx-auto text-gray-100">
+      <h2 class="text-2xl font-bold mb-6 text-center">{{ isEdit ? 'Edit Weapon' : 'Add New Weapon' }}</h2>
 
-    <div class="mb-4">
-      <label for="name" class="block text-blue-200 text-sm font-bold mb-2">Weapon Name:</label>
-      <input
-        type="text"
-        id="name"
-        v-model="weaponForm.name"
-        class="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
-        placeholder="e.g., Glock 19, AR-15"
-        required
-      />
-    </div>
+      <div class="space-y-4">
+        <div class="space-y-1">
+          <label for="name" class="inline-block text-sm font-medium">Weapon Name:</label>
+          <input
+            type="text"
+            id="name"
+            v-model="weaponForm.name"
+            class="block w-full rounded-lg border border-gray-600 px-5 py-3 leading-6 placeholder-gray-400 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 bg-gray-700 text-gray-100"
+            placeholder="e.g., Glock 19, AR-15"
+            required
+          />
+        </div>
 
-    <div class="mb-4">
-      <label for="type" class="block text-blue-200 text-sm font-bold mb-2">Weapon Type:</label>
-      <input
-        type="text"
-        id="type"
-        v-model="weaponForm.type"
-        class="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
-        placeholder="e.g., Pistol, Rifle, Shotgun"
-        required
-      />
-    </div>
+        <div class="space-y-1">
+          <label for="type" class="inline-block text-sm font-medium">Weapon Type:</label>
+          <select
+            id="type"
+            v-model="weaponForm.type"
+            class="block w-full rounded-lg border border-gray-600 px-5 py-3 leading-6 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 bg-gray-700 text-gray-100"
+            required
+          >
+            <option value="" disabled selected>Select a weapon type</option>
+            <option v-for="typeOption in weaponTypes" :key="typeOption" :value="typeOption">{{ typeOption }}</option>
+          </select>
+        </div>
 
-    <div class="mb-4">
-      <label for="caliber" class="block text-blue-200 text-sm font-bold mb-2">Caliber:</label>
-      <input
-        type="text"
-        id="caliber"
-        v-model="weaponForm.caliber"
-        class="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
-        placeholder="e.g., 9mm, .223 Rem"
-      />
-    </div>
+        <div class="space-y-1">
+          <label for="caliber" class="inline-block text-sm font-medium">Caliber:</label>
+          <select
+            id="caliber"
+            v-model="weaponForm.caliber"
+            class="block w-full rounded-lg border border-gray-600 px-5 py-3 leading-6 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 bg-gray-700 text-gray-100"
+          >
+            <option value="" disabled selected>Select a caliber (optional)</option>
+            <option v-for="caliberOption in calibers" :key="caliberOption" :value="caliberOption">{{ caliberOption }}</option>
+          </select>
+        </div>
 
-    <div class="mb-4">
-      <label for="purchaseDate" class="block text-blue-200 text-sm font-bold mb-2">Purchase Date:</label>
-      <input
-        type="date"
-        id="purchaseDate"
-        v-model="weaponForm.purchaseDate"
-        class="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
-      />
-    </div>
+        <div class="space-y-1">
+          <label for="purchaseDate" class="inline-block text-sm font-medium">Purchase Date:</label>
+          <input
+            type="date"
+            id="purchaseDate"
+            v-model="weaponForm.purchaseDate"
+            class="block w-full rounded-lg border border-gray-600 px-5 py-3 leading-6 placeholder-gray-400 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 bg-gray-700 text-gray-100"
+          />
+        </div>
 
-    <div class="mb-4 flex items-center">
-      <input
-        type="checkbox"
-        id="erva"
-        v-model="weaponForm.erva"
-        class="form-checkbox h-5 w-5 text-green-600 rounded"
-      />
-      <label for="erva" class="ml-2 block text-blue-200 text-sm font-bold">ERVA (Eligible for Restricted Veteran Activities)</label>
-    </div>
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            id="erva"
+            v-model="weaponForm.erva"
+            class="size-4 rounded-sm border border-gray-600 text-blue-500 checked:border-blue-500 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 bg-gray-700 dark:ring-offset-gray-900"
+          />
+          <label for="erva" class="ml-2 text-sm font-medium">ERVA (Eligible for Restricted Veteran Activities)</label>
+        </div>
 
-    <div class="mb-6">
-      <label for="notes" class="block text-blue-200 text-sm font-bold mb-2">Notes:</label>
-      <textarea
-        id="notes"
-        v-model="weaponForm.notes"
-        rows="3"
-        class="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
-        placeholder="Any additional notes about this weapon..."
-      ></textarea>
-    </div>
+        <div class="space-y-1">
+          <label for="notes" class="inline-block text-sm font-medium">Notes:</label>
+          <textarea
+            id="notes"
+            v-model="weaponForm.notes"
+            rows="3"
+            class="block w-full rounded-lg border border-gray-600 px-5 py-3 leading-6 placeholder-gray-400 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 bg-gray-700 text-gray-100"
+            placeholder="Any additional notes about this weapon..."
+          ></textarea>
+        </div>
 
-    <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-      <span class="block sm:inline">{{ errorMessage }}</span>
-    </div>
+        <div v-if="errorMessage" class="bg-red-800 text-white px-4 py-3 rounded relative text-sm" role="alert">
+          {{ errorMessage }}
+        </div>
 
-    <div class="flex items-center justify-between">
-      <button
-        type="submit"
-        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-        :disabled="loading"
-      >
-        {{ loading ? 'Saving...' : (isEdit ? 'Update Weapon' : 'Add Weapon') }}
-      </button>
-    </div>
-  </form>
+        <div>
+          <button
+            type="submit"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-blue-700 bg-blue-700 px-6 py-3 leading-6 font-semibold text-white hover:border-blue-600 hover:bg-blue-600 focus:ring-3 focus:ring-blue-400/50 active:border-blue-700 active:bg-blue-700"
+            :disabled="loading"
+          >
+            <svg
+              class="hi-mini hi-arrow-uturn-right inline-block size-5 opacity-50"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M12.207 2.232a.75.75 0 00.025 1.06l4.146 3.958H6.375a5.375 5.375 0 000 10.75H9.25a.75.75 0 000-1.5H6.375a3.875 3.875 0 010-7.75h10.003l-4.146 3.957a.75.75 0 001.036 1.085l5.5-5.25a.75.75 0 000-1.085l-5.5-5.25a.75.75 0 00-1.06.025z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <span>{{ loading ? 'Saving...' : (isEdit ? 'Update Weapon' : 'Add Weapon') }}</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script setup>
@@ -114,12 +132,22 @@ const weaponForm = ref({
 
 const errorMessage = ref('');
 
+// Predefined lists for dropdowns
+const weaponTypes = ref([
+  'Pistooli', 'Revolveri', 'Kivääri', 'Pienoiskivääri', 'Haulikko', 'Yhdistelmäase', 'Merkinantoase', 'Kaasuase', 
+  'Mustaruutiase', 'Ilma-ase', 'Deaktivoitu ampuma-ase', 'PCC (Pistol Caliber Carbine)', 'Muu ase'
+]);
+
+const calibers = ref([
+  '9mm', '.45 ACP', '.22LR', '.223 Rem (5.56x45mm)', '7.62x39mm', '7.62x51mm (.308 Win)',
+  '.50 BMG', '12 Gauge', '.357 Magnum', '.38 Special', '.40 S&W', '10mm Auto', 'Muu kaliberi'
+]);
+
 // Watch for changes in initialWeapon if it's loaded asynchronously
 watch(() => props.initialWeapon, (newVal) => {
   if (props.isEdit && newVal) {
     weaponForm.value = {
       ...newVal,
-      // Format purchaseDate for the input field if it exists
       purchaseDate: newVal.purchaseDate ? new Date(newVal.purchaseDate).toISOString().split('T')[0] : '',
     };
   }
@@ -128,18 +156,15 @@ watch(() => props.initialWeapon, (newVal) => {
 const handleSubmit = async () => {
   errorMessage.value = '';
   try {
-    // For MVP, we're only implementing create.
-    // If isEdit is true, you'd call an updateWeapon function here.
     const payload = { ...weaponForm.value };
-    // Convert purchaseDate to Date object if it's not empty
     if (payload.purchaseDate) {
       payload.purchaseDate = new Date(payload.purchaseDate);
     } else {
-      delete payload.purchaseDate; // Remove if empty to avoid sending empty string
+      delete payload.purchaseDate;
     }
 
     const savedWeapon = await createWeapon(payload);
-    emit('weapon-saved', savedWeapon); // Emit event to parent
+    emit('weapon-saved', savedWeapon);
     // Reset form after successful submission
     weaponForm.value = {
       name: '',
@@ -156,5 +181,5 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-/* Scoped styles for this component */
+/* No specific scoped styles needed if using Tailwind's active-class */
 </style>

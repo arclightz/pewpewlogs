@@ -1,7 +1,7 @@
 <template>
   <div class="px-4 py-8 relative min-h-screen">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold">Your Weapons</h1>
+      <h1 class="text-3xl font-bold">Aseinventaario</h1>
       <div class="flex items-center space-x-4">
         <button class="text-white hover:text-blue-200 focus:outline-none">
           <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -24,16 +24,17 @@
       <p>No weapons registered yet.</p>
       <p class="mt-2">Click the '+' button to add your first weapon!</p>
     </div>
-    <div v-else class="overflow-x-auto bg-gray-800 rounded-lg shadow-lg">
-      <table class="min-w-full divide-y divide-gray-700">
-        <thead class="bg-blue-700">
+    <div v-else>
+      <div class="hidden md:block overflow-x-auto bg-gray-800 rounded-lg shadow-lg">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-blue-700">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">Name</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">Type</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">Caliber</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">ERVA</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">Purchase Date</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">Notes</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">Nimi</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">Asetyyppi</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">Kaliberi</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">ERVA luvitettu</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">Ostopäivä</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider">Kommentit</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-700">
@@ -42,16 +43,31 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ weapon.type || 'N/A' }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ weapon.caliber || 'N/A' }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ weapon.erva ? 'Yes' : 'No' }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ weapon.purchaseDate ? new Date(weapon.purchaseDate).toLocaleDateString() : 'N/A' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ weapon.purchaseDate ? new Date(weapon.purchaseDate).toLocaleDateString('fi-FI') : 'N/A' }}</td>
             <td class="px-6 py-4 text-sm text-gray-300 max-w-xs truncate">{{ weapon.notes || '-' }}</td>
             </tr>
         </tbody>
       </table>
     </div>
-
+    
+    <div class="md:hidden space-y-4">
+      <div v-for="weapon in weapons" :key="weapon._id" class="bg-gray-800 p-4 rounded-lg shadow-md">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-semibold">{{ weapon.name }}</h3>
+          <span class="text-blue-300 text-sm">{{ weapon.type || 'N/A' }}</span>
+        </div>
+        <div class="text-sm text-gray-300 space-y-1">
+          <p><span class="font-medium text-gray-400">Kaliberi:</span> {{ weapon.caliber || 'N/A' }}</p>
+          <p><span class="font-medium text-gray-400">ERVA luvitettu:</span> {{ weapon.erva ? 'Yes' : 'No' }}</p>
+          <p><span class="font-medium text-gray-400">Ostopäivä:</span> {{ weapon.purchaseDate ? new Date(weapon.purchaseDate).toLocaleDateString('fi-FI') : 'N/A' }}</p>
+          <p><span class="font-medium text-gray-400">Kommentit:</span> {{ weapon.notes || '-' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
     <router-link
       to="/weapons/new"
-      class="fixed bottom-8 right-8 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 focus:outline-none"
+      class="fixed right-8 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 focus:outline-none bottom-24 md:bottom-8"
     >
       <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>

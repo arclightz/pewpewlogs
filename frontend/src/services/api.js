@@ -1,5 +1,7 @@
 // frontend/src/services/api.js
 import axios from 'axios';
+import router from '../router'; // Import the router instance
+import authService from './authService'; // Import authService for logout
 
 // Determine API base URL from environment variables.
 // In development, this will typically be your backend service in Docker Compose.
@@ -33,11 +35,16 @@ api.interceptors.response.use(
     // If the error status is 401 (Unauthorized) and it's not a login attempt itself,
     // it might mean the token is expired or invalid.
     if (error.response && error.response.status === 401 && !error.config.url.includes('/api/auth/login')) {
+      console.error('Unauthorized API request: Token might be expired or invalid. Redirecting to login...');
+      
       // You might want to automatically log out the user here
-      // import authService from './authService'; // You'd need to import it here
-      // authService.logout();
-      // router.push('/login'); // Redirect to login
-      console.error('Unauthorized API request. Token might be expired or invalid.');
+      authService.logout();
+      if (router.currentRoute.value.path !== 'Login') {
+        // Redirect to the login page if not already there
+        router.replace({ name: 'Login' });
+      }
+      router.push('/login'); // Redirect to login
+      
     }
     return Promise.reject(error);
   }

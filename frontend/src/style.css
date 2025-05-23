@@ -1,11 +1,14 @@
+/* frontend/src/style.css */
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
+  /* Keep color scheme for general theming, but actual background is set in App.vue */
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #242424; /* This will be overridden by App.vue's bg-gray-900 */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,7 +18,7 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #646cff; /* Default link color */
   text-decoration: inherit;
 }
 a:hover {
@@ -24,10 +27,22 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* REMOVED: display: flex; place-items: center; */
+  /* These were causing conflicts with the main app layout in App.vue */
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100vh; /* Ensure body takes full viewport height */
+
+  /* Fallback for older iOS versions */
+  padding-top: constant(safe-area-inset-top);
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-left: constant(safe-area-inset-left);
+  padding-right: constant(safe-area-inset-right);
+
+  /* For modern iOS and other devices */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 h1 {
@@ -59,10 +74,11 @@ button:focus-visible {
 }
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  /* REMOVED: max-width: 1280px; margin: 0 auto; padding: 2rem; text-align: center; */
+  /* These were forcing the entire app to be centered and limited width */
+  /* App.vue now handles the main layout and width */
+  width: 100%; /* Ensure #app takes full width available */
+  height: 100%; /* Ensure #app takes full height available */
 }
 
 @media (prefers-color-scheme: light) {
@@ -76,4 +92,13 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+/* Example for a fixed header/footer */
+.fixed-header {
+  padding-top: env(safe-area-inset-top);
+}
+
+.fixed-footer {
+  padding-bottom: env(safe-area-inset-bottom);
 }

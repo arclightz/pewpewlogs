@@ -8,7 +8,7 @@
     <div class="space-x-4">
       <router-link
         to="/register"
-        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+        class="bg-gray-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
       >
         Get Started
       </router-link>
