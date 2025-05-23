@@ -1,10 +1,8 @@
 // frontend/src/services/api.js
 import axios from 'axios';
-import router from '../router'; // Import the router instance
-import authService from './authService'; // Import authService for logout
+import router from '../router';
+import authService from './authService';
 
-// Determine API base URL from environment variables.
-// In development, this will typically be your backend service in Docker Compose.
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 const api = axios.create({
@@ -18,8 +16,12 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    console.log(`[Axios Interceptor] Token in localStorage (before send): ${!!token ? 'Present' : 'Absent'}`);
     if (token) {
-      config.headers['x-auth-token'] = token; // Attach token as 'x-auth-token' header
+      config.headers['x-auth-token'] = token;
+      console.log(`[Axios Interceptor] x-auth-token header set for request to: ${config.url}`);
+    } else {
+      console.warn(`[Axios Interceptor] No token found for request to: ${config.url}. Request will be unauthenticated.`);
     }
     return config;
   },
@@ -31,20 +33,19 @@ api.interceptors.request.use(
 // Response interceptor to handle token expiration or invalid tokens
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // If the error status is 401 (Unauthorized) and it's not a login attempt itself,
-    // it might mean the token is expired or invalid.
-    if (error.response && error.response.status === 401 && !error.config.url.includes('/api/auth/login')) {
-      console.error('Unauthorized API request: Token might be expired or invalid. Redirecting to login...');
-      
-      // You might want to automatically log out the user here
-      authService.logout();
-      if (router.currentRoute.value.path !== 'Login') {
-        // Redirect to the login page if not already there
-        router.replace({ name: 'Login' });
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      if (!error.config.url.includes('/api/auth/login')) {
+        console.error('Unauthorized API request (401): Token might be expired or invalid. Redirecting to login...');
+        
+        authService.logout();
+        
+        if (router.currentRoute.value.name !== 'Login') {
+          router.push({ name: 'Login' });
+        }
+      } else {
+        console.warn('Login attempt returned 401. Not redirecting.');
       }
-      router.push('/login'); // Redirect to login
-      
     }
     return Promise.reject(error);
   }

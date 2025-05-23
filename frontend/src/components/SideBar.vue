@@ -1,16 +1,10 @@
 <template>
   <aside
-    class="fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white transition-transform transform flex flex-col"
-    :class="{
-      'translate-x-0': isSidebarOpen, // Visible when open
-      '-translate-x-full': !isSidebarOpen, // Hidden (off-screen) when closed
-      'lg:translate-x-0': true // Always visible on large screens (overrides -translate-x-full)
-    }"
-    @click.stop="() => {}"
+    class="flex-shrink-0 h-screen bg-gray-800 text-white p-4 flex flex-col shadow-lg w-64 hidden md:flex"
   >
-    <div class="flex items-center justify-between p-4">
-      <router-link to="/" class="text-2xl font-bold">
-        <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div class="flex items-center justify-center mb-8 h-12">
+      <router-link to="/" class="text-white text-2xl font-bold">
+        <svg width="50" height="50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="200" height="200" fill="#1F2937"/>
             <g>
               <circle cx="100" cy="100" r="60" stroke="#3B82F6" stroke-width="6"/>
@@ -22,11 +16,6 @@
             </g>
         </svg>
       </router-link>
-      <button @click="$emit('close-sidebar')" class="text-white focus:outline-none lg:hidden">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
     </div>
 
     <nav class="mt-4 flex-grow overflow-y-auto">
@@ -34,12 +23,10 @@
         <li v-for="item in menuItems" :key="item.name">
           <router-link
             :to="item.path"
-            class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center"
+            class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center rounded-lg"
             active-class="bg-blue-600 text-white"
-            @click="$emit('close-sidebar')"
-          >
-            <svg
-              class="w-5 h-5 mr-3"
+            > <svg
+              class="w-5 h-5 mr-3 flex-shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -55,44 +42,78 @@
             {{ item.name }}
           </router-link>
         </li>
-      </ul>
+        </ul>
     </nav>
 
     <div class="mt-auto border-t border-gray-700 p-4">
-      <router-link
-        to="/profile"
-        class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center"
-        active-class="bg-blue-600 text-white"
-        @click="$emit('close-sidebar')"
-      >
-        My Profile
-      </router-link>
-      <button
-        @click="handleLogoutAndCloseMenu"
-        class="block w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white text-left flex items-center"
-      >
-        Logout
-      </button>
+      <template v-if="state.user">
+        <router-link
+          to="/profile"
+          class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center rounded-lg"
+          active-class="bg-blue-600 text-white"
+          > <svg class="w-6 h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+          </svg>
+          Profiili
+        </router-link>
+
+        <button
+          @click="handleLogoutAndCloseMenu"
+          class="block w-full px-4 py-2 text-sm text-gray-300 hover:bg-red-700 hover:text-white text-left flex items-center rounded-lg"
+        >
+          <svg class="w-6 h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m-3-1v1m-3-1v1m-3-1v1m-3-1v1a6 6 0 006 6h2a6 6 0 006-6v-1"></path>
+          </svg>
+          Kirjaudu ulos
+        </button>
+      </template>
+      <template v-else>
+        <router-link
+          to="/login"
+          class="block px-4 py-2 text-sm text-gray-300 hover:bg-blue-700 hover:text-white flex items-center rounded-lg mb-2"
+          active-class="bg-blue-600 text-white"
+          > <svg class="w-6 h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1m-3-1v1m-3-1v1m-3-1v1m-3-1v1a6 6 0 006 6h2a6 6 0 006-6v-1"></path>
+          </svg>
+          Kirjaudu sisään
+        </router-link>
+        <router-link
+          to="/register"
+          class="block px-4 py-2 text-sm text-gray-300 hover:bg-blue-700 hover:text-white flex items-center rounded-lg"
+          active-class="bg-blue-600 text-white"
+          > <svg class="w-6 h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+          </svg>
+          Rekisteröidy
+        </router-link>
+      </template>
     </div>
   </aside>
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits } from 'vue';
 import state from '../services/state';
-import authService from '../services/authService'; 
+import authService from '../services/authService';
 
 const props = defineProps({
-  isSidebarOpen: {
-    type: Boolean,
-    required: true,
-  },
+  // isSidebarOpen is no longer a prop as sidebar is static
+  // isSidebarOpen: {
+  //   type: Boolean,
+  //   required: true,
+  // },
 });
 
-const emit = defineEmits(['close-sidebar', 'logout']); // Explicitly define emitted events
+// Emits are no longer needed as sidebar is static
+const emit = defineEmits([]); // No emits needed
 
-// Example menu items (you'll replace this with your actual data)
-const menuItems = [
+const handleLogoutAndCloseMenu = () => {
+  authService.logout();
+  // No close-sidebar emit needed
+};
+
+// Define the menuItems array with name, path, and icon (SVG path)
+const menuItems = ref([
   {
     name: 'Ohjauspaneli',
     path: '/dashboard',
@@ -113,14 +134,23 @@ const menuItems = [
     path: '/statistics',
     icon: 'M11 3.055A9.001 9.001 0 1020.945 13H11V3.055zM20.488 9H15V3.512A9.025 9.025 0 0120.488 9z'
   },
-];
-
-const handleLogoutAndCloseMenu = () => {
-  authService.logout();
-  emit('close-sidebar'); // Close sidebar after logout
-};
+  {
+    name: 'Ampumaradat',
+    path: '/ranges',
+    icon: 'M8.157 2.176a1.5 1.5 0 0 0-1.147 0l-4.084 1.69A1.5 1.5 0 0 0 2 5.25v10.877a1.5 1.5 0 0 0 2.074 1.386l3.51-1.452 4.26 1.762a1.5 1.5 0 0 0 1.146 0l4.083-1.69A1.5 1.5 0 0 0 18 14.75V3.872a1.5 1.5 0 0 0-2.073-1.386l-3.51 1.452-4.26-1.762ZM7.58 5a.75.75 0 0 1 .75.75v6.5a.75.75 0 0 1-1.5 0v-6.5A.75.75 0 0 1 7.58 5Zm5.59 2.75a.75.75 0 0 0-1.5 0v6.5a.75.75 0 0 0 1.5 0v-6.5Z'
+  },
+]);
 </script>
 
 <style scoped>
-/* No specific scoped styles needed if using Tailwind's active-class */
+/* Base styles for the sidebar */
+aside {
+  width: 16rem; /* 256px */
+}
+
+/* Ensure the active link has a distinct color */
+.router-link-active {
+  background-color: #3b82f6; /* A slightly lighter blue for active link */
+  color: white;
+}
 </style>

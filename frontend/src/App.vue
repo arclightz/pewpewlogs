@@ -1,19 +1,17 @@
 <template>
   <div class="flex min-h-screen bg-gray-900 text-white">
-    <SideBar v-if="!isMobile" :is-sidebar-open="isSidebarOpen" @close-sidebar="closeSidebar" />
+    <SideBar v-if="!isMobile" />
 
     <div
       :class="{
-        'ml-64': isSidebarOpen && !isMobile,     // Desktop: Sidebar open, push content
-        'md:ml-20': !isSidebarOpen && !isMobile, // Desktop: Sidebar closed, subtle push
-        'ml-0': isMobile                         // Mobile: No sidebar, no push
+        'ml-64': !isMobile, // Desktop: Always push content by sidebar's width
+        'ml-0': isMobile    // Mobile: No sidebar, no push
       }"
       class="flex-1 flex flex-col transition-all duration-300 ease-in-out"
     >
-      <SideBar @toggle-sidebar="toggleSidebar" />
-
-      <main class="flex-1 overflow-y-auto pb-16 md:pb-0"> <div v-if="isLoading" class="flex items-center justify-center h-full">
-          <p>Loading application...</p>
+      <main class="flex-1 overflow-y-auto pb-16 md:pb-0">
+        <div v-if="isLoading" class="flex items-center justify-center h-full">
+          <p>Ladataan sovellusta...</p>
         </div>
         <router-view v-else></router-view>
       </main>
@@ -25,7 +23,8 @@
 
 <script setup>
 import { ref, onMounted, computed, onBeforeUnmount } from 'vue';
-//import TopNavBar from './components/TopNavBar.vue';
+// TopNavBar is removed
+// import TopNavBar from './components/TopNavBar.vue';
 import SideBar from './components/SideBar.vue';
 import BottomNavBar from './components/BottomNavBar.vue';
 import state from './services/state';
@@ -35,59 +34,64 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const user = ref(null);
 const isLoading = ref(true);
-const isSidebarOpen = ref(true); // Default to open on desktop
-const isMobile = ref(false); // Reactive state to track mobile view
+// isSidebarOpen state is no longer needed as sidebar is static
+// const isSidebarOpen = ref(true);
+const isMobile = ref(false);
 
 const isAuthenticated = computed(() => {
   return !!localStorage.getItem('token');
 });
 
-// Function to check if current view is mobile based on window width
 const checkMobile = () => {
-  // Tailwind's 'md' breakpoint is typically 768px
   isMobile.value = window.innerWidth < 768;
 };
 
 const checkAuthentication = async () => {
+  console.log("[App.vue] checkAuthentication started.");
   try {
     const token = localStorage.getItem('token');
+    console.log(`[App.vue] Token found: ${!!token ? 'Present' : 'Absent'}`);
     if (token) {
       await authService.fetchCurrentUser();
       user.value = state.user;
+      console.log(`[App.vue] state.user after fetch: ${!!state.user ? 'Populated' : 'Null'}`);
     } else {
       state.user = null;
       user.value = null;
+      console.log("[App.vue] No token, state.user cleared.");
     }
 
     if (isAuthenticated.value && router.currentRoute.value.path === '/') {
+       console.log("[App.vue] Authenticated on root, redirecting to dashboard.");
        router.push('/dashboard');
     }
   } catch (error) {
-    console.error('Error during authentication check:', error);
+    console.error('[App.vue] Error during authentication check:', error);
     localStorage.removeItem('token');
     state.user = null;
   } finally {
     isLoading.value = false;
+    console.log("[App.vue] checkAuthentication finished. isLoading set to false.");
   }
 };
 
-const toggleSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value;
-};
-
-const closeSidebar = () => {
-  // Always close sidebar when a link is clicked, regardless of screen size
-  isSidebarOpen.value = false;
-};
+// Sidebar toggle/close functions are no longer needed
+// const toggleSidebar = () => {
+//   isSidebarOpen.value = !isSidebarOpen.value;
+// };
+// const closeSidebar = () => {
+//   isSidebarOpen.value = false;
+// };
 
 onMounted(async () => {
+  console.log("[App.vue] Component mounted. Starting authentication check.");
   await checkAuthentication();
-  checkMobile(); // Initial check on mount
-  window.addEventListener('resize', checkMobile); // Add resize listener
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', checkMobile); // Clean up listener
+  window.removeEventListener('resize', checkMobile);
 });
 </script>
 

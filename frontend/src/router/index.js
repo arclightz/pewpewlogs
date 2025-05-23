@@ -6,14 +6,16 @@ import state from '../services/state'; // <-- CHANGE: Import your global state
 // Import your views
 import LandingPage from '../views/LandingPage.vue';
 import Dashboard from '../views/Dashboard.vue';
-import Login from '../views/Login.vue'; // New
-import Register from '../views/Register.vue'; // New
+import Login from '../views/Login.vue'; 
+import Register from '../views/Register.vue'; 
 import SessionList from '../views/SessionList.vue';
 import CreateSession from '../views/CreateSession.vue';
 import WeaponList from '../views/WeaponList.vue';
 import CreateWeapon from '../views/CreateWeapon.vue';
 import UserProfile from '../views/UserProfile.vue';
 import Statistics from '../views/Statistics.vue';
+import AddShootingRange from '../views/AddShootingRange.vue';
+import ShootingRangeList from '../views/ShootingRangeList.vue'; 
 
 const routes = [
   {
@@ -73,6 +75,18 @@ const routes = [
     component: Statistics,
     meta: { requiresAuth: true },
   },
+  {
+    path: '/ranges', // This is the route in question
+    name: 'ShootingRangeList',
+    component: ShootingRangeList,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/ranges/new',
+    name: 'AddShootingRange',
+    component: AddShootingRange,
+    meta: { requiresAuth: true },
+  },
   // Catch-all route for 404
   {
     path: '/:pathMatch(.*)*',
@@ -93,6 +107,7 @@ router.beforeEach(async (to, from, next) => {
   if (!state.user && authService.isAuthenticated()) { // <-- CHANGE: Use state.user here
     try {
       await authService.fetchCurrentUser();
+      console.log("[Router Guard] User fetched successfully.");
     } catch (error) {
       console.error("Error fetching current user on route navigation:", error);
       // If fetching user fails (e.g., invalid token), it will be logged out by authService
@@ -100,6 +115,7 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const isAuthenticated = authService.isAuthenticated();
+  console.log(`[Router Guard] Is Authenticated: ${isAuthenticated} for route ${to.path}`);
 
   // If the route requires authentication and the user is not authenticated, redirect to login
   if (to.meta.requiresAuth && !isAuthenticated) {

@@ -4,21 +4,14 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/database'); // Import your database connection function
 const authRoutes = require('./routes/auth'); // Import your new authentication routes
-// const userRoutes = require('./routes/users'); // Example: Import user-related routes
-const sessionRoutes = require('./routes/sessions'); // Example: Import session-related routes
-const weaponRoutes = require('./routes/weapons'); // <--- IMPORTANT: Import your new weapon routes
-const statsRoutes = require('./routes/stats'); // Example: Import stats-related routes
+// const userRoutes = require('./routes/users'); // Import user-related routes
+const sessionRoutes = require('./routes/sessions'); // Import session-related routes
+const weaponRoutes = require('./routes/weapons'); // Import your new weapon routes
+const statsRoutes = require('./routes/stats'); // Import stats-related routes
+const shootingRangeRoutes = require('./routes/shootingRanges'); // Import shooting range-related routes
 
 const app = express();
 
-// Connect to Database
-// Note: The actual connection execution is typically done in the server.js file
-// to ensure the application doesn't start listening until the DB is ready.
-// This import is just making the function available.
-
-// Init Middleware
-// express.json() middleware parses incoming requests with JSON payloads.
-// It's essential for handling data sent from your frontend forms (e.g., login, register).
 app.use(express.json({ extended: false }));
 
 // cors() middleware enables Cross-Origin Resource Sharing.
@@ -34,10 +27,9 @@ app.use('/api/weapons', weaponRoutes);
 // app.use('/api/users', userRoutes);
 app.use('/api/sessions', sessionRoutes); 
 app.use('/api/weapons', weaponRoutes);
-app.use('/api/stats', statsRoutes); 
+app.use('/api/stats', statsRoutes);
+app.use('/api/ranges', shootingRangeRoutes);
 
-// Mount your other application-specific routes.
-// Ensure these files exist and export an Express Router.
 
 // Basic route for testing if the API is running
 app.get('/', (req, res) => res.send('API Running'));

@@ -1,9 +1,10 @@
 // frontend/src/main.js
-import { createApp } from 'vue'; // Import the createApp function from Vue
-import App from './App.vue'; // Import the root App component
-import router from './router'; // Import your Vue Router instance
-import './style.css'; // Import your main CSS file (e.g., for global styles or Tailwind directives)
-import './assets/tailwind.css'; // Assuming you have a dedicated Tailwind CSS file for imports
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import './style.css'; 
+import './assets/tailwind.css';
+import 'leaflet/dist/leaflet.css';
 
 // Create the Vue application instance
 const app = createApp(App);
