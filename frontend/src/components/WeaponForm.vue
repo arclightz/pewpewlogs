@@ -134,8 +134,8 @@ const errorMessage = ref('');
 
 // Predefined lists for dropdowns
 const weaponTypes = ref([
-  'Pistooli', 'Revolveri', 'Kivääri', 'Pienoiskivääri', 'Haulikko', 'Yhdistelmäase', 'Merkinantoase', 'Kaasuase', 
-  'Mustaruutiase', 'Ilma-ase', 'Deaktivoitu ampuma-ase', 'PCC (Pistol Caliber Carbine)', 'Muu ase'
+  'Pistooli', 'Kivääri', 'Haulikko', 'Revolveri', 'PCC', 'Ilma-ase', 
+  'Deaktivoitu ampuma-ase','Muu','Yhdistelmäase', 'Merkinantoase', 'Kaasuase' 
 ]);
 
 const calibers = ref([

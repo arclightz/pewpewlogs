@@ -1,7 +1,8 @@
 // backend/src/controllers/sessionController.js
 const Session = require('../models/sessions');
 const Weapon = require('../models/weapons');
-const ShootingRange = require('../models/shootingRanges'); // Import ShootingRange model
+const ShootingRange = require('../models/shootingRanges');
+const mongoose = require('mongoose');
 
 /**
  * @desc Create a new shooting session
@@ -10,22 +11,25 @@ const ShootingRange = require('../models/shootingRanges'); // Import ShootingRan
  */
 exports.createSession = async (req, res) => {
   try {
-    const { date, range, weaponId, ammunitionType, ammunitionCount, numberOfShotsFired, distanceToTarget, hits, misses, notes } = req.body;
+    const {
+      date, range, weaponId, numberOfShotsFired, type, sportType, role, weather,
+      ammunitionType, ammunitionCount, distanceToTarget, hits, misses, notes,
+      result, hitFactor, compScore, photos, signature
+    } = req.body;
 
-    if (!date || !range || !weaponId) {
-      return res.status(400).json({ message: 'Päivämäärä, ampumarata ja ase vaaditaan istunnolle.' });
+    // Basic validation for new mandatory fields
+    if (!date || !range || !weaponId || numberOfShotsFired === undefined || type === undefined || sportType === undefined) {
+      return res.status(400).json({ message: 'Päivämäärä, ampumarata, ase, laukausten määrä, tyyppi ja laji vaaditaan istunnolle.' });
     }
 
-    // Verify if the weaponId belongs to the authenticated user (STILL REQUIRED)
     const weapon = await Weapon.findOne({ _id: weaponId, userId: req.user.id });
     if (!weapon) {
       return res.status(404).json({ message: 'Asetta ei löytynyt tai se ei kuulu käyttäjälle.' });
     }
 
-    // FIX: Only verify that the range EXISTS, not that it belongs to the user
-    const shootingRange = await ShootingRange.findById(range); // Removed userId filter
+    const shootingRange = await ShootingRange.findById(range);
     if (!shootingRange) {
-      return res.status(404).json({ message: 'Ampumarataa ei löytynyt.' }); // Shooting range not found
+      return res.status(404).json({ message: 'Ampumarataa ei löytynyt.' });
     }
 
     const newSession = new Session({
@@ -33,20 +37,31 @@ exports.createSession = async (req, res) => {
       date,
       range,
       weapon: weaponId,
+      numberOfShotsFired,
+      type,
+      sportType,
+      role,
+      weather,
       ammunitionType,
       ammunitionCount,
-      numberOfShotsFired,
       distanceToTarget,
       hits,
       misses,
-      notes
+      notes,
+      result,
+      hitFactor,
+      compScore,
+      photos,
+      signature
     });
 
     const savedSession = await newSession.save();
 
+    // Populate weapon and range details for the response
     const populatedSession = await Session.findById(savedSession._id)
-                                         .populate('weapon', 'name type')
-                                         .populate('range', 'name address');
+                                         .populate('weapon', 'name type caliber') // Added caliber
+                                         .populate('range', 'name address')
+                                         .lean(); // Use lean for faster response
 
     res.status(201).json(populatedSession);
   } catch (err) {
@@ -67,7 +82,7 @@ exports.createSession = async (req, res) => {
 exports.getSessions = async (req, res) => {
   try {
     const sessions = await Session.find({ userId: req.user.id })
-      .populate('weapon', 'name type')
+      .populate('weapon', 'name type caliber') // Added caliber to populate
       .populate('range', 'name address')
       .sort({ date: -1 })
       .lean();

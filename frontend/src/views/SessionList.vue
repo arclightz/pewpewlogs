@@ -1,7 +1,7 @@
 <template>
   <div class="px-4 py-8 relative min-h-screen">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold">Ampumapäiväkirja</h1>
+      <h1 class="text-3xl font-bold">Ampumaistuntosi</h1>
       <div class="flex items-center space-x-4">
         <button class="text-white hover:text-blue-200 focus:outline-none">
           <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -27,20 +27,50 @@
     <div v-else>
       <div class="hidden md:block overflow-x-auto bg-gray-800 rounded-lg shadow-lg">
         <table class="min-w-full divide-y divide-gray-700">
-          <thead class="bg-gray-700"> <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Kirjausaika</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Ampumarata</th> <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Ase</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Ammutut laukaukset</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Osumat/Hutit</th> <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Etäisyys</th> <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Muistiinpanot</th> </tr>
+          <thead class="bg-gray-700">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider"></th> <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Pvm</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Tyyppi</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Laji</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Ampumarata</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Ase</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Laukauksia</th>
+            </tr>
           </thead>
           <tbody class="divide-y divide-gray-700">
-            <tr v-for="session in sessions" :key="session._id" class="hover:bg-gray-700 transition-colors duration-200">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ new Date(session.date).toLocaleDateString('fi-FI') }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ session.range?.name || 'N/A' }}</td> <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ session.weapon?.name || 'N/A' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ session.numberOfShotsFired || 0 }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ session.hits || 0 }} / {{ session.misses || 0 }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ session.distanceToTarget || 'N/A' }}m</td>
-              <td class="px-6 py-4 text-sm text-gray-300 max-w-xs break-words">{{ session.notes || '-' }}</td> </tr>
+            <template v-for="session in sessions" :key="session._id">
+              <tr class="hover:bg-gray-700 transition-colors duration-200">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <button @click="toggleDetails(session._id)" class="text-blue-400 hover:text-blue-300 focus:outline-none">
+                    <svg class="w-5 h-5 transform transition-transform duration-200" :class="{'rotate-90': expandedSessions.has(session._id)}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" :d="SVG_ICONS.expand" />
+                    </svg>
+                  </button>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ new Date(session.date).toLocaleDateString('fi-FI') }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ session.type || 'N/A' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ session.sportType || 'N/A' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ session.range?.name || 'N/A' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ session.weapon?.name || 'N/A' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ session.numberOfShotsFired || 0 }}</td>
+              </tr>
+              <tr v-if="expandedSessions.has(session._id)" class="bg-gray-700">
+                <td :colspan="tableColumnCount" class="p-4">
+                  <div class="bg-gray-900 p-4 rounded-lg shadow-inner space-y-2 text-sm text-gray-300">
+                    <p v-if="session.weather"><span class="font-medium text-gray-400">Sää:</span> {{ session.weather }}</p>
+                    <p v-if="session.ammunitionType"><span class="font-medium text-gray-400">Ammustyyppi:</span> {{ session.ammunitionType }} ({{ session.ammunitionCount || 0 }})</p>
+                    <p v-if="session.result"><span class="font-medium text-gray-400">Tulos:</span> {{ session.result }}</p>
+                    <p v-if="session.hitFactor"><span class="font-medium text-gray-400">Hit Factor:</span> {{ session.hitFactor }}</p>
+                    <p v-if="session.compScore"><span class="font-medium text-gray-400">Kilpailutulos (%):</span> {{ session.compScore }}%</p>
+                    <p v-if="session.distanceToTarget"><span class="font-medium text-gray-400">Etäisyys:</span> {{ session.distanceToTarget }}m</p>
+                    <p v-if="session.role"><span class="font-medium text-gray-400">Rooli:</span> {{ session.role }}</p>
+                    <p v-if="session.notes"><span class="font-medium text-gray-400">Muistiinpanot:</span> {{ session.notes }}</p>
+                    <p v-if="session.photos && session.photos.length > 0"><span class="font-medium text-gray-400">Kuvat:</span> ({{ session.photos.length }} kuvaa)</p>
+                    <p v-if="session.signature"><span class="font-medium text-gray-400">Allekirjoitus:</span> (Näytä allekirjoitus)</p>
+                  </div>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -48,14 +78,33 @@
       <div class="md:hidden space-y-4">
         <div v-for="session in sessions" :key="session._id" class="bg-gray-800 p-4 rounded-lg shadow-md">
           <div class="flex justify-between items-center mb-2">
-            <h3 class="text-lg font-semibold">{{ new Date(session.date).toLocaleDateString('fi-FI') }}</h3>
-            <span class="text-gray-300 text-sm">{{ session.range?.name || 'N/A' }}</span> </div>
+            <h3 class="text-lg font-semibold">{{ new Date(session.date).toLocaleDateString('fi-FI') }} - {{ session.type || 'N/A' }}</h3>
+            <span class="text-gray-300 text-sm">{{ session.sportType || 'N/A' }}</span>
+          </div>
           <div class="text-sm text-gray-300 space-y-1">
+            <p><span class="font-medium text-gray-400">Ampumarata:</span> {{ session.range?.name || 'N/A' }}</p>
             <p><span class="font-medium text-gray-400">Ase:</span> {{ session.weapon?.name || 'N/A' }} ({{ session.weapon?.type || 'N/A' }})</p>
-            <p><span class="font-medium text-gray-400">Ammutut laukaukset:</span> {{ session.numberOfShotsFired || 0 }}</p>
-            <p><span class="font-medium text-gray-400">Osumat/Hutit:</span> {{ session.hits || 0 }} / {{ session.misses || 0 }}</p>
-            <p><span class="font-medium text-gray-400">Etäisyys:</span> {{ session.distanceToTarget || 'N/A' }}m</p>
-            <p v-if="session.notes"><span class="font-medium text-gray-400">Muistiinpanot:</span> {{ session.notes }}</p>
+            <p><span class="font-medium text-gray-400">Laukauksia:</span> {{ session.numberOfShotsFired || 0 }}</p>
+          </div>
+          <div class="mt-3 border-t border-gray-700 pt-3">
+            <button @click="toggleDetails(session._id)" class="w-full text-left font-semibold text-blue-400 hover:text-blue-300 focus:outline-none">
+              {{ expandedSessions.has(session._id) ? 'Piilota tiedot' : 'Näytä lisätiedot' }}
+              <svg class="inline-block w-4 h-4 ml-2 transform transition-transform duration-200" :class="{'rotate-90': expandedSessions.has(session._id)}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" :d="SVG_ICONS.expand" />
+              </svg>
+            </button>
+            <div v-if="expandedSessions.has(session._id)" class="space-y-1 mt-2">
+              <p v-if="session.weather"><span class="font-medium text-gray-400">Sää:</span> {{ session.weather }}</p>
+              <p v-if="session.ammunitionType"><span class="font-medium text-gray-400">Ammustyyppi:</span> {{ session.ammunitionType }} ({{ session.ammunitionCount || 0 }})</p>
+              <p v-if="session.result"><span class="font-medium text-gray-400">Tulos:</span> {{ session.result }}</p>
+              <p v-if="session.hitFactor"><span class="font-medium text-gray-400">Hit Factor:</span> {{ session.hitFactor }}</p>
+              <p v-if="session.compScore"><span class="font-medium text-gray-400">Kilpailutulos (%):</span> {{ session.compScore }}%</p>
+              <p v-if="session.distanceToTarget"><span class="font-medium text-gray-400">Etäisyys:</span> {{ session.distanceToTarget }}m</p>
+              <p v-if="session.role"><span class="font-medium text-gray-400">Rooli:</span> {{ session.role }}</p>
+              <p v-if="session.notes"><span class="font-medium text-gray-400">Muistiinpanot:</span> {{ session.notes }}</p>
+              <p v-if="session.photos && session.photos.length > 0"><span class="font-medium text-gray-400">Kuvat:</span> ({{ session.photos.length }} kuvaa)</p>
+              <p v-if="session.signature"><span class="font-medium text-gray-400">Allekirjoitus:</span> (Näytä allekirjoitus)</p>
+            </div>
           </div>
         </div>
       </div>
@@ -73,10 +122,32 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useSessions } from '../composables/useSessions';
+import { SVG_ICONS } from '../constants/menuItems'; // IMPORTANT: Import SVG_ICONS
 
 const { sessions, loading, error, fetchSessions } = useSessions();
+
+// State to manage expanded session details
+const expandedSessions = ref(new Set());
+
+// Computed property for table column count for colspan
+const tableColumnCount = computed(() => {
+  // Count the number of <th> elements in the desktop table header
+  // This needs to be manually kept in sync with the template
+  return 7; // Expand icon + 6 mandatory fields
+});
+
+
+const toggleDetails = (sessionId) => {
+  if (expandedSessions.value.has(sessionId)) {
+    expandedSessions.value.delete(sessionId);
+  } else {
+    expandedSessions.value.add(sessionId);
+  }
+  // Force reactivity update for Set
+  expandedSessions.value = new Set(expandedSessions.value);
+};
 
 onMounted(() => {
   fetchSessions();

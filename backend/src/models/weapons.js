@@ -2,53 +2,45 @@
 const mongoose = require('mongoose');
 
 const WeaponSchema = new mongoose.Schema({
-  // Name of the weapon (e.g., "Glock 19", "AR-15")
   name: {
     type: String,
-    required: [true, 'Weapon name is required'],
-    trim: true, // Remove whitespace from both ends of a string
-    maxlength: [100, 'Name cannot be more than 100 characters']
+    required: [true, 'Aseen nimi vaaditaan'], 
+    trim: true,
+    maxlength: [100, 'Nimi voi olla enintään 100 merkkiä pitkä'] 
   },
-  // Type of weapon (e.g., "Pistol", "Rifle", "Shotgun")
+  
   type: {
     type: String,
-    required: [true, 'Weapon type is required'],
+    required: [true, 'Aseen tyyppi vaaditaan'], 
     trim: true,
-    maxlength: [50, 'Type cannot be more than 50 characters']
+    maxlength: [50, 'Tyyppi voi olla enintään 50 merkkiä pitkä'], 
+    enum: ['Pistooli', 'Kivääri', 'Haulikko', 'Revolveri', 'PCC', 'Ilma-ase', 'Deaktivoitu ampuma-ase','Muu','Yhdistelmäase', 'Merkinantoase', 'Kaasuase'],
   },
-  // Caliber of the weapon (e.g., "9mm", ".223 Rem", "12 Gauge")
   caliber: {
     type: String,
     trim: true,
-    maxlength: [50, 'Caliber cannot be more than 50 characters'],
-    default: null // Allow null if not specified
+    maxlength: [50, 'Kaliiberi voi olla enintään 50 merkkiä pitkä'], 
+    default: null
   },
-  // ERVA (Extremely dangerous weapon in finnish law) - assuming this is a boolean flag
-  // Set to false by default if not provided
   erva: {
     type: Boolean,
-    required: [true, 'ERVA status is required'],
+    required: [true, 'ERVA-status vaaditaan'], 
     default: false
   },
-  // Date when the weapon was purchased
   purchaseDate: {
     type: Date,
-    default: null // Allow null if not specified
+    default: null
   },
-  // Any additional notes about the weapon
   notes: {
     type: String,
-    maxlength: [500, 'Notes cannot be more than 500 characters'],
-    default: null // Allow null if not specified
+    maxlength: [500, 'Muistiinpanot voivat olla enintään 500 merkkiä pitkiä'], 
+    default: null
   },
-  // Reference to the User who owns this weapon
-  // This creates a relationship with the User model
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Refers to the 'User' model (assuming your user model is named 'User')
+    ref: 'User',
     required: true
   },
-  // Automatically add createdAt and updatedAt timestamps
 }, {
   timestamps: true
 });

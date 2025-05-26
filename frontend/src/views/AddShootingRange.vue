@@ -20,8 +20,7 @@
             <li v-for="result in searchResults" :key="result.osm_id"
                 @click="selectAddress(result)"
                 class="p-2 cursor-pointer hover:bg-blue-600 text-sm">
-              {{ result.display_name }}
-            </li>
+              {{ formatNominatimAddress(result.address) }} </li>
           </ul>
         </div>
 
@@ -84,10 +83,10 @@
 import { ref, onMounted } from 'vue';
 import { LMap, LTileLayer, LMarker } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
-import api from '../services/api'; // IMPORTANT: Import 'api' for backend calls
+import api from '../services/api';
 import { useApi } from '../composables/useApi';
-import axios from 'axios'; // IMPORTANT: Keep axios for Nominatim calls
-import { useRouter } from 'vue-router'; // IMPORTANT: Added useRouter import
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 // Workaround for Leaflet's default icon issue with Webpack/Vite
 import L from 'leaflet';
@@ -105,7 +104,7 @@ L.Marker.prototype.options.icon = L.icon({
   shadowSize: [41, 41]
 });
 
-const router = useRouter(); // Initialize router
+const router = useRouter();
 const { loading, error: apiError, execute } = useApi();
 const errorMessage = ref('');
 
@@ -155,6 +154,7 @@ const searchAddress = async () => {
         params: {
           q: addressSearchTerm.value,
           format: 'json',
+          addressdetails: 1, // FIX: Request address details for structured data
           limit: 5,
         },
         headers: {
@@ -170,8 +170,35 @@ const searchAddress = async () => {
   }, 500);
 };
 
+// Helper function to format Nominatim address details
+const formatNominatimAddress = (addressDetails) => {
+  const parts = [];
+  if (addressDetails.road) {
+    parts.push(addressDetails.road);
+  }
+  if (addressDetails.house_number) {
+    parts.push(addressDetails.house_number);
+  }
+  const streetAndNumber = parts.join(' ');
+
+  const cityParts = [];
+  if (addressDetails.postcode) {
+    cityParts.push(addressDetails.postcode);
+  }
+  if (addressDetails.city) {
+    cityParts.push(addressDetails.city);
+  } else if (addressDetails.town) {
+    cityParts.push(addressDetails.town);
+  } else if (addressDetails.village) {
+    cityParts.push(addressDetails.village);
+  }
+  const postalCodeAndCity = cityParts.join(' ');
+
+  return [streetAndNumber, postalCodeAndCity].filter(Boolean).join(', ');
+};
+
 const selectAddress = (result) => {
-  rangeForm.value.address = result.display_name;
+  rangeForm.value.address = formatNominatimAddress(result.address); // FIX: Use formatted address
   rangeForm.value.location = {
     lat: parseFloat(result.lat),
     lng: parseFloat(result.lon),
@@ -210,17 +237,18 @@ const reverseGeocode = async (lat, lng) => {
         lat: lat,
         lon: lng,
         format: 'json',
+        addressdetails: 1, // FIX: Request address details for structured data
       },
       headers: {
         'User-Agent': 'PewPewLogsApp/1.0 (your-email@example.com)'
       }
     });
-    if (response.data.display_name) {
-      rangeForm.value.address = response.data.display_name;
+    if (response.data.address) { // FIX: Check for address object
+      rangeForm.value.address = formatNominatimAddress(response.data.address); // FIX: Use formatted address
     } else {
       rangeForm.value.address = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
     }
-    console.log("[AddShootingRange] Reverse geocoding result:", response.data.display_name);
+    console.log("[AddShootingRange] Reverse geocoding result:", rangeForm.value.address); // Log formatted result
   } catch (err) {
     console.error('[AddShootingRange] Reverse geocoding failed:', err);
     errorMessage.value = 'Osoitteen hakeminen karttasijainnista epäonnistui.';
