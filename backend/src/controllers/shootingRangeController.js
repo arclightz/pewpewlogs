@@ -12,11 +12,12 @@ exports.createRange = async (req, res) => {
     const { name, address, latitude, longitude, notes, website, phoneNumber } = req.body;
 
     if (!name || !address || latitude === undefined || longitude === undefined) {
+      console.log("[ShootingRange Controller] Validation failed: Missing mandatory fields.");
       return res.status(400).json({ message: 'Nimi, osoite ja sijainti (leveys- ja pituusaste) vaaditaan.' });
     }
 
     const newRange = new ShootingRange({
-      userId: req.user.id, // Still link to the user who created it
+      userId: req.user.id,
       name,
       address,
       location: {
@@ -29,6 +30,7 @@ exports.createRange = async (req, res) => {
     });
 
     const savedRange = await newRange.save();
+    console.log("[ShootingRange Controller] Range created:", savedRange._id);
     res.status(201).json(savedRange);
   } catch (err) {
     console.error('Virhe ampumaradan luomisessa:', err.message);
@@ -47,8 +49,8 @@ exports.createRange = async (req, res) => {
  */
 exports.getRanges = async (req, res) => {
   try {
-    // FIX: Removed userId filter. All authenticated users can see all ranges.
-    const ranges = await ShootingRange.find({}).lean(); // No filter by userId
+    const ranges = await ShootingRange.find({}).lean();
+    console.log(`[ShootingRange Controller] getRanges: Found ${ranges.length} ranges.`);
     res.json(ranges);
   } catch (err) {
     console.error('Virhe ampumaratojen hakemisessa:', err.message);
@@ -63,15 +65,18 @@ exports.getRanges = async (req, res) => {
  */
 exports.getRangeById = async (req, res) => {
   try {
-    // FIX: Removed userId filter. Any authenticated user can get a range by ID.
+    console.log(`[ShootingRange Controller] getRangeById: ID = ${req.params.id}`);
     const range = await ShootingRange.findById(req.params.id);
     if (!range) {
-      return res.status(404).json({ message: 'Ampumarataa ei löytynyt.' }); // Range not found
+      console.log("[ShootingRange Controller] getRangeById: Range not found.");
+      return res.status(404).json({ message: 'Ampumarataa ei löytynyt.' });
     }
+    console.log("[ShootingRange Controller] getRangeById: Range found.");
     res.json(range);
   } catch (err) {
     console.error('Virhe yksittäisen ampumaradan hakemisessa:', err.message);
     if (err.name === 'CastError') {
+      console.log("[ShootingRange Controller] getRangeById: Invalid ID format.");
       return res.status(400).json({ message: 'Virheellinen ampumaradan ID-muoto.' });
     }
     res.status(500).json({ message: 'Palvelinvirhe ampumaradan hakemisessa.' });

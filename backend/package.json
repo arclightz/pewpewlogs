@@ -1,48 +1,31 @@
 {
-  "name": "pewpewlogs",
-  "version": "0.0.0",
-  "private": true,
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node ./src/server.js",
-    "test": "jest --setupFiles dotenv/config --detectOpenHandles",
     "dev": "nodemon ./src/server.js",
-    "lint": "eslint . ",
-    "format": "prettier --write src/",
-    "build": "npm run lint && npm run test",
-    "seed": "node seed.js"
+    "seed": "node seed.js",
+    "test": "jest --runInBand --forceExit"
   },
-  "devDependencies": {
-    "@eslint/js": "^9.5.0",
-    "eslint": "^9.5.0",
-    "globals": "^15.6.0",
-    "jest": "~29.7.0",
-    "nodemon": "^3.1.4",
-    "prettier": "^3.3.2",
-    "supertest": "7.0.0"
-  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@kinde-oss/kinde-nodejs-sdk": "^1.2.3",
-    "bcryptjs": "^3.0.2",
-    "cookie-parser": "~1.4.4",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "debug": "~2.6.9",
+    "debug": "^4.3.4",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "express-session": "^1.18.0",
-    "http-errors": "~1.6.3",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.15.0",
-    "morgan": "~1.9.1",
-    "mysql2": "^3.10.1",
-    "pug": "^3.0.3",
-    "sequelize": "^6.37.3"
+    "mongoose": "^8.4.0",
+    "nodemon": "^3.1.0"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "./src/config/testSetup.js"
-    ],
-    "resetModules": true,
-    "verbose": true
+  "devDependencies": {
+    "jest": "^29.x.x",
+    "supertest": "^6.x.x",
+    "dotenv": "^16.4.5"
   }
 }
