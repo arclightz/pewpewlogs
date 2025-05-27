@@ -1,79 +1,86 @@
-# Shooting Statistics App
+# PewPew Logs - Ampumapäiväkirja
 
-This application is designed to help users log, manage, and analyze shooting statistics. The backend is built with Node.js and Express.js, while the frontend is powered by Vue.js.
+## Sisällysluettelo
+1.  [Yleiskatsaus](#1-yleiskatsaus)
+2.  [Ominaisuudet](#2-ominaisuudet)
+3.  [Teknologiat](#3-teknologiat)
+4.  [Arkkitehtuuri & Käyttöönotto](#4-arkkitehtuuri--käyttöönotto)
+5.  [Paikallinen Kehitys](#5-paikallinen-kehitys)
+6.  [Testaus](#6-testaus)
+7.  [Lisenssi](#7-lisenssi)
 
-## Features
+---
 
-### User Authentication
-- **Sign up / Login**: Supports Single Sign-On (SSO) from Google, Facebook, GitHub, and other providers.
-- **Profile Management**: Users can manage their profiles, including personal details and preferences.
+## 1. Yleiskatsaus
 
-### Session Logging
-- **Date and Time**: Log the date and time of each shooting session.
-- **Location**: Record the location where the session took place.
-- **Weapon Used**: Specify the weapon used during the session.
-- **Ammunition Details**: Keep track of the ammunition used.
-- **User Details**: Record details about the user participating in the session.
+PewPew Logs on henkilökohtainen ampumapiväkirja, joka on suunniteltu ampujille. Sen avulla voit kirjata ja seurata ampumaistuntojasi, hallita asevarastoasi ja analysoida suorituskykyäsi ajan mittaan. Tavoitteena on tarjota intuitiivinen alusta, joka auttaa ampujia kehittymään ja pysymään ajan tasalla harrastuksestaan.
 
-### Shot Tracking
-- **Shot Placement**: Track the coordinates of each shot on a target.
-- **Number of Shots Fired**: Record the total number of shots fired.
-- **Distance to Target**: Log the distance from the shooter to the target.
-- **Scoring**: Track hits/misses and points per shot.
+## 2. Ominaisuudet (MVP)
 
-### Statistics and Analytics
-- **Total Shots Fired**: Analyze the total number of shots fired with different weapons and ammunition.
-- **Accuracy Percentage**: Calculate accuracy using mathematical functions.
-- **Progress Over Time**: Visualize progress with graphs and charts.
-- **Best/Worst Sessions**: Identify the best and worst sessions based on performance.
+* **Käyttäjähallinta:**
+    * Rekisteröinti ja sisäänkirjautuminen (JWT-pohjainen autentikointi).
+    * Profiilin tarkastelu.
+* **Ampumaistuntojen hallinta:**
+    * Uusien istuntojen kirjaaminen kattavilla tiedoilla (päivämäärä, ampumarata, ase, laukausmäärä, tyyppi, laji, rooli, sää, muistiinpanot, tulokset).
+    * Valinnaisten kenttien laajentaminen/piilottaminen lomakkeella.
+    * Istuntojen tarkastelu listana.
+    * Istunnon tallentaminen "mallina" (kopioi arvot uuteen istuntoon).
+* **Aseiden hallinta:**
+    * Aseiden lisääminen ja hallinta (nimi, tyyppi, kaliiberi, ERVA, ostopäivä, muistiinpanot).
+    * Aseen tyypin ja kaliiberin valinta alasvetovalikoista.
+    * Ampumatyypin automaattinen täyttyminen aseen kaliiberin perusteella.
+* **Ampumaratojen hallinta:**
+    * Ampumaratojen lisääminen (nimi, osoite, puhelin, verkkosivusto, muistiinpanot).
+    * Sijainnin paikannus kartalta (OpenStreetMap / Leaflet).
+    * Osoitehaku ja käänteinen geokoodaus (Nominatim).
+    * Ampumaratojen tarkastelu listana laajennettavilla tiedoilla ja kartalla.
+* **Tilastot:**
+    * Yleiset tilastot ja laukausmäärät asetyypeittäin.
+* **Käyttökokemus:**
+    * Responsiivinen käyttöliittymä (pöytäkone: staattinen sivupalkki, mobiili: alapalkki).
+    * Suomenkielinen käyttöliittymä.
 
-### Additional Features
-- **Session Notes**: Add notes for each session to keep track of important details or observations.
-- **Trainer Signature**: Allow trainers to add their hand-drawn signature to sessions.
-- **Upload Photos**: Upload photos of targets for detailed analysis.
-- **Practice Reminders**: Set reminders for upcoming practice sessions.
-- **Data Export**: Export data in CSV or PDF format for external analysis.
-- **List of Weapons**: Provide a ready-made list of weapons for easy selection.
+## 3. Teknologiat
 
-## Installation
+### Frontend
+* **Vue.js 3:** Progressiivinen JavaScript-viitekehys käyttöliittymien rakentamiseen.
+* **Vite:** Rakennustyökalu nopeaan kehitykseen.
+* **Tailwind CSS:** Järjestelmä nopeaan ja responsiiviseen käyttöliittymän tyylittelyyn.
+* **Vue Router 4:** Reititykseen.
+* **Axios:** HTTP-pyyntöihin backendille.
+* **Leaflet.js & @vue-leaflet/vue-leaflet:** Interaktiivisten karttojen toteuttamiseen.
 
-1. **Clone the Repository**:
-   ```sh
-   git clone https://github.com/your-username/your-repository.git
-   cd your-repository
+### Backend
+* **Node.js:** JavaScript-ajoympäristö.
+* **Express.js:** Nopea ja joustava Node.js-verkkosovelluskehys.
+* **Mongoose:** MongoDB-objektimallinnustyökalu Node.js:lle.
+* **bcryptjs:** Salasanojen hashaukseen.
+* **jsonwebtoken:** Käyttäjän autentikointiin (JWT).
+* **cors:** CORS-käytäntöjen sallimiseen.
+* **dotenv:** Ympäristömuuttujien lataamiseen paikallisessa kehityksessä.
 
-2. **Backend Setup**:
-	Navigate to the backend directory:
-    ```sh
-    cd backend
-    npm install
-    npm run dev
+### Tietokanta
+* **MongoDB:** NoSQL-dokumenttitietokanta.
 
+### Käyttöönottoalustat (Deployment)
+* **MongoDB Atlas:** Tietokannan pilvipalvelu.
+* **Render:** Backend API:n isännöinti (ilmaispalvelu).
+* **Vercel:** Frontend-sovelluksen isännöinti (ilmaispalvelu).
 
-2. **Frontend Setup**:
-    Navigate to the frontend directory:
-    ```sh
-    cd frontend
-    npm install
-    npm run dev
+## 4. Arkkitehtuuri & Käyttöönotto
 
+Sovellus noudattaa tyypillistä client-server-arkkitehtuuria:
 
-## Usage ##
+```mermaid
+C4Context
+    title Järjestelmän konteksti - PewPew Logs
+    Person(user, "Käyttäjä")
+    System(frontend_app, "PewPew Logs Frontend", "Vue.js-sovellus, isännöity Vercelissä")
+    System(backend_api, "PewPew Logs Backend API", "Node.js/Express.js-sovellus, isännöity Renderissä")
+    SystemDb(mongodb_atlas, "MongoDB Atlas", "Pilvipohjainen NoSQL-tietokanta")
+    System_Ext(nominatim_api, "OpenStreetMap Nominatim API", "Ulkoinen geokoodauspalvelu")
 
-- **User Authentication**: Users can sign up and log in using various SSO providers.
-- **Logging Sessions**: Users can log details about their shooting sessions, including date, time, location, weapon, and ammunition.
-- **Tracking Shots**: Users can record shot placements, distances, and scores.
-- **Analyzing Performance**: Users can view statistics and analytics to track their progress over time.
-- **Additional Features**: Users can add notes, trainer signatures, upload photos, set reminders, and export their data.
-
-## Contributing ##
-
-Contributions are welcome! Please fork the repository and create a pull request with your changes. Ensure that your code adheres to the project’s coding standards and includes relevant tests.
-
-## License ##
-
-This project is licensed under the MIT License. See the LICENSE file for more details.
-
-## Contact ##
-
-For any questions or suggestions, feel free to open an issue or contact the project maintainer.
+    Rel(user, frontend_app, "Käyttää")
+    Rel(frontend_app, backend_api, "Tekee API-kutsuja (HTTP/HTTPS)")
+    Rel(backend_api, mongodb_atlas, "Lukee ja kirjoittaa dataa (MongoDB-ajuri)")
+    Rel(frontend_app, nominatim_api, "Hakee osoitetietoja (HTTP/HTTPS)")
