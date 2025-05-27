@@ -5,7 +5,9 @@ const http = require('http'); // Node's built-in HTTP server module
 // Import the connectDB function from your database configuration
 // Assuming database.js exports an object with a connectDB property, or it's a named export.
 const connectDB = require('./config/database');
-require('dotenv').config(); // Load environment variables from .env file
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config({ path: './.env' }); // Adjust path if .env is in backend folder
+}
 
 // --- Database Connection ---
 // Execute the database connection function.

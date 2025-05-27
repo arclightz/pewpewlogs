@@ -3,9 +3,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users'); // Assuming your user model is at this path
 
-// Load environment variables (for JWT_SECRET)
-require('dotenv').config();
-
 // Secret key for JWT signing (use an environment variable in production)
 const JWT_SECRET = process.env.JWT_SECRET || '5b8f0e3c7d9e4aefb1c0f46a7c13d29e8c45e14f9b11ab4e2c8f7d16bc9a3d5e'; // IMPORTANT: Use a strong, unique secret in your .env file!
 

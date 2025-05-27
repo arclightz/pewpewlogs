@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); // For hashing user passwords
-require('dotenv').config({ path: './.env' }); // Load .env from backend folder
+
 
 // Import your Mongoose models
 const User = require('./src/models/users');
