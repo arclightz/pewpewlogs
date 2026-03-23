@@ -5,6 +5,7 @@ import Charts
 struct StatisticsView: View {
     @Query(sort: \Session.date, order: .reverse) private var sessions: [Session]
     @Query private var weapons: [Weapon]
+    @Query private var ranges: [ShootingRange]
 
     var body: some View {
         Group {
@@ -45,17 +46,18 @@ struct StatisticsView: View {
     private var statsContent: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Summary Cards
                 summaryCards
-
-                // Shots Over Time
-                shotsOverTimeCard
-
-                // Sessions by Type
+                cumulativeShotsCard
+                monthlyShotsCard
+                if !hitFactorData.isEmpty {
+                    hitFactorCard
+                }
+                if !compScoreData.isEmpty {
+                    compScoreCard
+                }
                 sessionsByTypeCard
-
-                // Per Weapon Breakdown
                 perWeaponCard
+                rangeUsageCard
             }
             .padding(.horizontal)
             .padding(.bottom, 24)
@@ -88,38 +90,133 @@ struct StatisticsView: View {
         }
     }
 
-    // MARK: - Shots Over Time
+    // MARK: - Cumulative Shots (line)
 
-    private var shotsOverTimeCard: some View {
-        VStack(spacing: 0) {
-            HStack {
-                SectionHeader(title: "Laukaukset ajan mittaan", icon: "chart.xyaxis.line")
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 8)
-
-            Chart(sessions) { session in
-                BarMark(
-                    x: .value("Päivä", session.date, unit: .day),
-                    y: .value("Laukauksia", session.numberOfShotsFired)
+    private var cumulativeShotsCard: some View {
+        StatChartCard(title: "Laukaukset yhteensä", icon: "chart.xyaxis.line") {
+            Chart(cumulativeShotsData) { point in
+                AreaMark(
+                    x: .value("Päivä", point.date),
+                    y: .value("Laukauksia", point.totalShots)
                 )
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Color(hex: "667EEA"), Color(hex: "764BA2")],
+                        colors: [Color(hex: "667EEA").opacity(0.3), Color(hex: "764BA2").opacity(0.05)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+
+                LineMark(
+                    x: .value("Päivä", point.date),
+                    y: .value("Laukauksia", point.totalShots)
+                )
+                .foregroundStyle(Color(hex: "667EEA"))
+                .lineStyle(StrokeStyle(lineWidth: 2.5))
+
+                PointMark(
+                    x: .value("Päivä", point.date),
+                    y: .value("Laukauksia", point.totalShots)
+                )
+                .foregroundStyle(Color(hex: "764BA2"))
+                .symbolSize(20)
+            }
+            .standardAxes()
+        }
+    }
+
+    // MARK: - Monthly Shot Volume (bars)
+
+    private var monthlyShotsCard: some View {
+        StatChartCard(title: "Laukauksia per kuukausi", icon: "chart.bar.fill") {
+            Chart(monthlyShotsData) { point in
+                BarMark(
+                    x: .value("Kuukausi", point.date, unit: .month),
+                    y: .value("Laukauksia", point.shots)
+                )
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color(hex: "11998E"), Color(hex: "38EF7D")],
                         startPoint: .bottom,
                         endPoint: .top
                     )
                 )
                 .cornerRadius(4)
             }
-            .frame(height: 200)
+            .standardAxes(dateFormat: .dateTime.month(.abbreviated))
+        }
+    }
+
+    // MARK: - Hit Factor Trend (line)
+
+    private var hitFactorCard: some View {
+        StatChartCard(title: "Hit Factor -kehitys", icon: "bolt.fill") {
+            Chart(hitFactorData) { point in
+                LineMark(
+                    x: .value("Päivä", point.date),
+                    y: .value("HF", point.value)
+                )
+                .foregroundStyle(Color(hex: "F2994A"))
+                .lineStyle(StrokeStyle(lineWidth: 2.5))
+
+                PointMark(
+                    x: .value("Päivä", point.date),
+                    y: .value("HF", point.value)
+                )
+                .foregroundStyle(Color(hex: "F2994A"))
+                .symbolSize(30)
+                .annotation(position: .top, spacing: 4) {
+                    Text(String(format: "%.1f", point.value))
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(Color(hex: "F2994A"))
+                }
+            }
+            .standardAxes()
+        }
+    }
+
+    // MARK: - Competition Scores Trend (line)
+
+    private var compScoreCard: some View {
+        StatChartCard(title: "Kilpailutulokset", icon: "trophy.fill") {
+            Chart(compScoreData) { point in
+                AreaMark(
+                    x: .value("Päivä", point.date),
+                    y: .value("%", point.value)
+                )
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color(hex: "EB3349").opacity(0.2), Color(hex: "F45C43").opacity(0.02)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+
+                LineMark(
+                    x: .value("Päivä", point.date),
+                    y: .value("%", point.value)
+                )
+                .foregroundStyle(Color(hex: "EB3349"))
+                .lineStyle(StrokeStyle(lineWidth: 2.5))
+
+                PointMark(
+                    x: .value("Päivä", point.date),
+                    y: .value("%", point.value)
+                )
+                .foregroundStyle(Color(hex: "EB3349"))
+                .symbolSize(30)
+                .annotation(position: .top, spacing: 4) {
+                    Text(String(format: "%.1f%%", point.value))
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(Color(hex: "EB3349"))
+                }
+            }
+            .chartYScale(domain: 0...100)
             .chartXAxis {
-                AxisMarks(values: .stride(by: .day)) { _ in
+                AxisMarks(values: .automatic(desiredCount: 5)) { _ in
                     AxisGridLine()
                         .foregroundStyle(Color(.separator).opacity(0.3))
-                    AxisValueLabel(format: .dateTime.day().month(), centered: true)
+                    AxisValueLabel(format: .dateTime.day().month(.abbreviated), centered: true)
                         .font(.caption2)
                 }
             }
@@ -131,15 +228,10 @@ struct StatisticsView: View {
                         .font(.caption2)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 16)
         }
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
-        .shadow(color: AppTheme.cardShadow, radius: 8, x: 0, y: 4)
     }
 
-    // MARK: - Sessions by Type
+    // MARK: - Sessions by Type (donut)
 
     private var sessionsByTypeCard: some View {
         VStack(spacing: 0) {
@@ -163,7 +255,6 @@ struct StatisticsView: View {
             .frame(height: 200)
             .padding(.horizontal, 16)
 
-            // Legend
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                 ForEach(sessionTypeStats, id: \.type) { stat in
                     HStack(spacing: 6) {
@@ -188,7 +279,7 @@ struct StatisticsView: View {
         .shadow(color: AppTheme.cardShadow, radius: 8, x: 0, y: 4)
     }
 
-    // MARK: - Per Weapon Breakdown
+    // MARK: - Per Weapon Breakdown (list)
 
     private var perWeaponCard: some View {
         VStack(spacing: 0) {
@@ -249,7 +340,79 @@ struct StatisticsView: View {
         .shadow(color: AppTheme.cardShadow, radius: 8, x: 0, y: 4)
     }
 
-    // MARK: - Computed Stats
+    // MARK: - Range Usage (horizontal bars)
+
+    private var rangeUsageCard: some View {
+        StatChartCard(title: "Ratojen käyttö", icon: "mappin.circle.fill") {
+            Chart(rangeStats) { stat in
+                BarMark(
+                    x: .value("Käyntejä", stat.sessionCount),
+                    y: .value("Rata", stat.name)
+                )
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color(hex: "F093FB"), Color(hex: "F5576C")],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(4)
+                .annotation(position: .trailing, spacing: 4) {
+                    Text("\(stat.sessionCount)")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .chartXAxis(.hidden)
+            .chartYAxis {
+                AxisMarks { _ in
+                    AxisValueLabel()
+                        .font(.caption)
+                }
+            }
+        }
+    }
+
+    // MARK: - Data Models
+
+    private struct DateValuePoint: Identifiable {
+        let id = UUID()
+        let date: Date
+        let value: Double
+    }
+
+    private struct CumulativeShotPoint: Identifiable {
+        let id = UUID()
+        let date: Date
+        let totalShots: Int
+    }
+
+    private struct MonthlyShotPoint: Identifiable {
+        let id = UUID()
+        let date: Date
+        let shots: Int
+    }
+
+    private struct WeaponStat {
+        let weapon: Weapon
+        let totalShots: Int
+        let sessionCount: Int
+    }
+
+    private struct TypeStat {
+        let type: String
+        let sessionType: SessionType
+        let count: Int
+    }
+
+    private struct RangeStat: Identifiable {
+        let id = UUID()
+        let name: String
+        let sessionCount: Int
+    }
+
+    // MARK: - Computed Data
 
     private var totalShots: Int {
         sessions.reduce(0) { $0 + $1.numberOfShotsFired }
@@ -260,10 +423,38 @@ struct StatisticsView: View {
         return "\(totalShots / sessions.count)"
     }
 
-    private struct WeaponStat {
-        let weapon: Weapon
-        let totalShots: Int
-        let sessionCount: Int
+    private var cumulativeShotsData: [CumulativeShotPoint] {
+        let sorted = sessions.sorted { $0.date < $1.date }
+        var cumulative = 0
+        return sorted.map { session in
+            cumulative += session.numberOfShotsFired
+            return CumulativeShotPoint(date: session.date, totalShots: cumulative)
+        }
+    }
+
+    private var monthlyShotsData: [MonthlyShotPoint] {
+        let cal = Calendar.current
+        let grouped = Dictionary(grouping: sessions) { session in
+            cal.dateInterval(of: .month, for: session.date)?.start ?? session.date
+        }
+        return grouped.map { MonthlyShotPoint(date: $0.key, shots: $0.value.reduce(0) { $0 + $1.numberOfShotsFired }) }
+            .sorted { $0.date < $1.date }
+    }
+
+    private var hitFactorData: [DateValuePoint] {
+        sessions.sorted { $0.date < $1.date }
+            .compactMap { session in
+                guard let hf = session.hitFactor else { return nil }
+                return DateValuePoint(date: session.date, value: hf)
+            }
+    }
+
+    private var compScoreData: [DateValuePoint] {
+        sessions.sorted { $0.date < $1.date }
+            .compactMap { session in
+                guard let cs = session.compScore else { return nil }
+                return DateValuePoint(date: session.date, value: cs)
+            }
     }
 
     private var weaponStats: [WeaponStat] {
@@ -279,16 +470,76 @@ struct StatisticsView: View {
         .sorted { $0.totalShots > $1.totalShots }
     }
 
-    private struct TypeStat {
-        let type: String
-        let sessionType: SessionType
-        let count: Int
-    }
-
     private var sessionTypeStats: [TypeStat] {
         let grouped = Dictionary(grouping: sessions) { $0.type }
         return grouped.map { TypeStat(type: $0.key.rawValue, sessionType: $0.key, count: $0.value.count) }
             .sorted { $0.count > $1.count }
+    }
+
+    private var rangeStats: [RangeStat] {
+        let grouped = Dictionary(grouping: sessions.filter { $0.range != nil }) { $0.range!.name }
+        return grouped.map { RangeStat(name: $0.key, sessionCount: $0.value.count) }
+            .sorted { $0.sessionCount > $1.sessionCount }
+    }
+}
+
+// MARK: - Reusable Chart Card
+
+private struct StatChartCard<ChartContent: View>: View {
+    let title: String
+    let icon: String
+    @ViewBuilder let chart: () -> ChartContent
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                SectionHeader(title: title, icon: icon)
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 8)
+
+            chart()
+                .frame(height: 200)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
+        }
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
+        .shadow(color: AppTheme.cardShadow, radius: 8, x: 0, y: 4)
+    }
+}
+
+// MARK: - Chart Axis Modifier
+
+private struct StandardAxesModifier: ViewModifier {
+    var dateFormat: Date.FormatStyle = .dateTime.day().month(.abbreviated)
+
+    func body(content: Content) -> some View {
+        content
+            .chartXAxis {
+                AxisMarks(values: .automatic(desiredCount: 5)) { _ in
+                    AxisGridLine()
+                        .foregroundStyle(Color(.separator).opacity(0.3))
+                    AxisValueLabel(format: dateFormat, centered: true)
+                        .font(.caption2)
+                }
+            }
+            .chartYAxis {
+                AxisMarks { _ in
+                    AxisGridLine()
+                        .foregroundStyle(Color(.separator).opacity(0.3))
+                    AxisValueLabel()
+                        .font(.caption2)
+                }
+            }
+    }
+}
+
+extension Chart {
+    func standardAxes(dateFormat: Date.FormatStyle = .dateTime.day().month(.abbreviated)) -> some View {
+        modifier(StandardAxesModifier(dateFormat: dateFormat))
     }
 }
 
