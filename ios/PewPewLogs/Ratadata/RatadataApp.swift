@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct PewPewLogsApp: App {
+struct RatadataApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

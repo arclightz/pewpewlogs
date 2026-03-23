@@ -1,0 +1,531 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		112678DA0796B9A16CEB25E0 /* WeaponListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5752472F4A0A31947C355D4 /* WeaponListView.swift */; };
+		1CF2CD39BCAD41C3D7264E5A /* RangeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CD77E756F5F2EF5C8128A8 /* RangeListView.swift */; };
+		2784E9B98EED8A75867649F1 /* RatadataApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98EA0BA81ED93A9C81AC32E /* RatadataApp.swift */; };
+		2C47FA1BF6D184851D7D5C5E /* PreviewSampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D572C127275DBBDFBBCD1CE1 /* PreviewSampleData.swift */; };
+		32B28CD2520FF3B7182C9C7E /* SessionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A999A00D8230DF6EEAF61A30 /* SessionType.swift */; };
+		45ADC5908AB94443B3B71C44 /* SportTypeMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE58AEA676527AC5DB73DB4 /* SportTypeMapping.swift */; };
+		46A3BFD52FDCBB1B8F62E6DB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177B907EDE4623E107C4B6C2 /* ContentView.swift */; };
+		4963FE5B358EDCB8F6BB30C7 /* ShootingRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = D284D1A6385B50F8B99915F2 /* ShootingRange.swift */; };
+		558AFFC45B8A254F719D5494 /* Contents.json in Resources */ = {isa = PBXBuildFile; fileRef = 2CC6C3AE0CE71D808F078DAA /* Contents.json */; };
+		60578A3867A4E0206359E669 /* RangeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE07A68679012F46ED6B495F /* RangeDetailView.swift */; };
+		71E95422751DC399142920AD /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033CED39A6C1F25BB12B55CD /* StatisticsView.swift */; };
+		7E7117D86EF202B837653270 /* WeaponFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DA95AE5542BC0B3C79EB22 /* WeaponFormView.swift */; };
+		851F336C0574703324CDAAD3 /* WeaponType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40D6631F86C7DF8B7141DDFD /* WeaponType.swift */; };
+		9532F7F0517B671F486F1EE8 /* RangeFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F743122F0D1BF1D188B2A72 /* RangeFormView.swift */; };
+		9D29257C506F87C3B1D939A4 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BDDD1B98CD56D7A32D3B731 /* Theme.swift */; };
+		B7C2368764190676B47F8527 /* Weapon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832F6780C270464AD74CA5C0 /* Weapon.swift */; };
+		BB1C97896791662D4F586053 /* SessionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E885246CFBEE8E539E559903 /* SessionListView.swift */; };
+		CE9ADBAD8AEB2220BA61B583 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B2767BF675960618970408 /* DashboardView.swift */; };
+		D22394ED1DD164B31BB2E8D7 /* SessionFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3330ACC8A49CB460FF495B80 /* SessionFormView.swift */; };
+		D265318724646F94B81D44E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A983C34141EED8EFDD98301 /* Assets.xcassets */; };
+		DA2E99FAE3833184BD0C2035 /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8644F477DDC0C26059C8D95 /* SessionDetailView.swift */; };
+		E0180EF9A415FE6FA9ED8D09 /* DateFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52C7BC0FF36AD842347A0A1 /* DateFormatters.swift */; };
+		EDB0B3D06660DA34A183F7FE /* WeaponDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51556233EEAE760DC7E710CB /* WeaponDetailView.swift */; };
+		EFF8A480F4A8948D466BF032 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5348149786F5BD04F41C77 /* Session.swift */; };
+		F2F9AD62D40F713B51598440 /* SessionRole.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E26F0C0727C13E8736EC697 /* SessionRole.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		00CD77E756F5F2EF5C8128A8 /* RangeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeListView.swift; sourceTree = "<group>"; };
+		033CED39A6C1F25BB12B55CD /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		16DA95AE5542BC0B3C79EB22 /* WeaponFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaponFormView.swift; sourceTree = "<group>"; };
+		177B907EDE4623E107C4B6C2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2BDDD1B98CD56D7A32D3B731 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		2CC6C3AE0CE71D808F078DAA /* Contents.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Contents.json; sourceTree = "<group>"; };
+		2E26F0C0727C13E8736EC697 /* SessionRole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRole.swift; sourceTree = "<group>"; };
+		3330ACC8A49CB460FF495B80 /* SessionFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionFormView.swift; sourceTree = "<group>"; };
+		40D6631F86C7DF8B7141DDFD /* WeaponType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaponType.swift; sourceTree = "<group>"; };
+		51556233EEAE760DC7E710CB /* WeaponDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaponDetailView.swift; sourceTree = "<group>"; };
+		832F6780C270464AD74CA5C0 /* Weapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weapon.swift; sourceTree = "<group>"; };
+		8F743122F0D1BF1D188B2A72 /* RangeFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeFormView.swift; sourceTree = "<group>"; };
+		9A983C34141EED8EFDD98301 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A0B2767BF675960618970408 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		A52C7BC0FF36AD842347A0A1 /* DateFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatters.swift; sourceTree = "<group>"; };
+		A999A00D8230DF6EEAF61A30 /* SessionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionType.swift; sourceTree = "<group>"; };
+		BAE58AEA676527AC5DB73DB4 /* SportTypeMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportTypeMapping.swift; sourceTree = "<group>"; };
+		BE5348149786F5BD04F41C77 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		C5752472F4A0A31947C355D4 /* WeaponListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaponListView.swift; sourceTree = "<group>"; };
+		D284D1A6385B50F8B99915F2 /* ShootingRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShootingRange.swift; sourceTree = "<group>"; };
+		D572C127275DBBDFBBCD1CE1 /* PreviewSampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewSampleData.swift; sourceTree = "<group>"; };
+		E885246CFBEE8E539E559903 /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
+		E98EA0BA81ED93A9C81AC32E /* RatadataApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatadataApp.swift; sourceTree = "<group>"; };
+		EE07A68679012F46ED6B495F /* RangeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeDetailView.swift; sourceTree = "<group>"; };
+		F8644F477DDC0C26059C8D95 /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
+		FCD16D1AE6DBF7106E513DDE /* Ratadata.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Ratadata.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		06DC7A29D3E366DE9E6A6B95 = {
+			isa = PBXGroup;
+			children = (
+				44B0F8FE6CD0FF19CF9FCFA3 /* Ratadata */,
+				0A507BA80B2BCA58CFE65DA9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0A507BA80B2BCA58CFE65DA9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FCD16D1AE6DBF7106E513DDE /* Ratadata.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0AA526E179104AD6CA0A9AAC /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				A0B2767BF675960618970408 /* DashboardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		18DDAA9CAAA4C3330B6B27C7 /* Ranges */ = {
+			isa = PBXGroup;
+			children = (
+				EE07A68679012F46ED6B495F /* RangeDetailView.swift */,
+				8F743122F0D1BF1D188B2A72 /* RangeFormView.swift */,
+				00CD77E756F5F2EF5C8128A8 /* RangeListView.swift */,
+			);
+			path = Ranges;
+			sourceTree = "<group>";
+		};
+		2264557EB140C9BCB55D50EF /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				A52C7BC0FF36AD842347A0A1 /* DateFormatters.swift */,
+				D572C127275DBBDFBBCD1CE1 /* PreviewSampleData.swift */,
+				BAE58AEA676527AC5DB73DB4 /* SportTypeMapping.swift */,
+				2BDDD1B98CD56D7A32D3B731 /* Theme.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		2E9E2B67136CE93FC8596F20 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				BE5348149786F5BD04F41C77 /* Session.swift */,
+				D284D1A6385B50F8B99915F2 /* ShootingRange.swift */,
+				832F6780C270464AD74CA5C0 /* Weapon.swift */,
+				BD44B8700FCE66E746B0FBCF /* Enums */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		44B0F8FE6CD0FF19CF9FCFA3 /* Ratadata */ = {
+			isa = PBXGroup;
+			children = (
+				9A983C34141EED8EFDD98301 /* Assets.xcassets */,
+				E98EA0BA81ED93A9C81AC32E /* RatadataApp.swift */,
+				2E9E2B67136CE93FC8596F20 /* Models */,
+				B34D605B590A380025415460 /* Preview Content */,
+				C24BDA9E7C6BC769C2769652 /* Services */,
+				2264557EB140C9BCB55D50EF /* Utilities */,
+				4AE919AF8FEAB1C00D1A3F18 /* ViewModels */,
+				9C1A02188EC948AD47656D6E /* Views */,
+			);
+			path = Ratadata;
+			sourceTree = "<group>";
+		};
+		4AE919AF8FEAB1C00D1A3F18 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		7D96EEED12CDD1F25AC7BB29 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		9203C6917DF0C6C20883570A /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		9C1A02188EC948AD47656D6E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				177B907EDE4623E107C4B6C2 /* ContentView.swift */,
+				7D96EEED12CDD1F25AC7BB29 /* Auth */,
+				9203C6917DF0C6C20883570A /* Components */,
+				0AA526E179104AD6CA0A9AAC /* Dashboard */,
+				A0A752627C95605D7CABEB58 /* Profile */,
+				18DDAA9CAAA4C3330B6B27C7 /* Ranges */,
+				B0998D194121DE3E54F645B5 /* Sessions */,
+				D69B0C3EEF5D2AF1720EB552 /* Statistics */,
+				F9908C390E89C221BF2A105D /* Weapons */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A0A752627C95605D7CABEB58 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		B0998D194121DE3E54F645B5 /* Sessions */ = {
+			isa = PBXGroup;
+			children = (
+				F8644F477DDC0C26059C8D95 /* SessionDetailView.swift */,
+				3330ACC8A49CB460FF495B80 /* SessionFormView.swift */,
+				E885246CFBEE8E539E559903 /* SessionListView.swift */,
+			);
+			path = Sessions;
+			sourceTree = "<group>";
+		};
+		B34D605B590A380025415460 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				2CC6C3AE0CE71D808F078DAA /* Contents.json */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		BD44B8700FCE66E746B0FBCF /* Enums */ = {
+			isa = PBXGroup;
+			children = (
+				2E26F0C0727C13E8736EC697 /* SessionRole.swift */,
+				A999A00D8230DF6EEAF61A30 /* SessionType.swift */,
+				40D6631F86C7DF8B7141DDFD /* WeaponType.swift */,
+			);
+			path = Enums;
+			sourceTree = "<group>";
+		};
+		C24BDA9E7C6BC769C2769652 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		D69B0C3EEF5D2AF1720EB552 /* Statistics */ = {
+			isa = PBXGroup;
+			children = (
+				033CED39A6C1F25BB12B55CD /* StatisticsView.swift */,
+			);
+			path = Statistics;
+			sourceTree = "<group>";
+		};
+		F9908C390E89C221BF2A105D /* Weapons */ = {
+			isa = PBXGroup;
+			children = (
+				51556233EEAE760DC7E710CB /* WeaponDetailView.swift */,
+				16DA95AE5542BC0B3C79EB22 /* WeaponFormView.swift */,
+				C5752472F4A0A31947C355D4 /* WeaponListView.swift */,
+			);
+			path = Weapons;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		46D49004D7E8BFE4DA78508F /* Ratadata */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EB1FFC6CEBBFAE7B597BE955 /* Build configuration list for PBXNativeTarget "Ratadata" */;
+			buildPhases = (
+				57E8A3ACF0A24DD79BA816B1 /* Sources */,
+				7EAE5679ACF7901A5EE42F6A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Ratadata;
+			packageProductDependencies = (
+			);
+			productName = Ratadata;
+			productReference = FCD16D1AE6DBF7106E513DDE /* Ratadata.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		15590F72989B19FA840DC3E7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					46D49004D7E8BFE4DA78508F = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 35B5FE8C03D3E3C603D90CF0 /* Build configuration list for PBXProject "Ratadata" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 06DC7A29D3E366DE9E6A6B95;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 0A507BA80B2BCA58CFE65DA9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				46D49004D7E8BFE4DA78508F /* Ratadata */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7EAE5679ACF7901A5EE42F6A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D265318724646F94B81D44E1 /* Assets.xcassets in Resources */,
+				558AFFC45B8A254F719D5494 /* Contents.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		57E8A3ACF0A24DD79BA816B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				46A3BFD52FDCBB1B8F62E6DB /* ContentView.swift in Sources */,
+				CE9ADBAD8AEB2220BA61B583 /* DashboardView.swift in Sources */,
+				E0180EF9A415FE6FA9ED8D09 /* DateFormatters.swift in Sources */,
+				2C47FA1BF6D184851D7D5C5E /* PreviewSampleData.swift in Sources */,
+				60578A3867A4E0206359E669 /* RangeDetailView.swift in Sources */,
+				9532F7F0517B671F486F1EE8 /* RangeFormView.swift in Sources */,
+				1CF2CD39BCAD41C3D7264E5A /* RangeListView.swift in Sources */,
+				2784E9B98EED8A75867649F1 /* RatadataApp.swift in Sources */,
+				EFF8A480F4A8948D466BF032 /* Session.swift in Sources */,
+				DA2E99FAE3833184BD0C2035 /* SessionDetailView.swift in Sources */,
+				D22394ED1DD164B31BB2E8D7 /* SessionFormView.swift in Sources */,
+				BB1C97896791662D4F586053 /* SessionListView.swift in Sources */,
+				F2F9AD62D40F713B51598440 /* SessionRole.swift in Sources */,
+				32B28CD2520FF3B7182C9C7E /* SessionType.swift in Sources */,
+				4963FE5B358EDCB8F6BB30C7 /* ShootingRange.swift in Sources */,
+				45ADC5908AB94443B3B71C44 /* SportTypeMapping.swift in Sources */,
+				71E95422751DC399142920AD /* StatisticsView.swift in Sources */,
+				9D29257C506F87C3B1D939A4 /* Theme.swift in Sources */,
+				B7C2368764190676B47F8527 /* Weapon.swift in Sources */,
+				EDB0B3D06660DA34A183F7FE /* WeaponDetailView.swift in Sources */,
+				7E7117D86EF202B837653270 /* WeaponFormView.swift in Sources */,
+				112678DA0796B9A16CEB25E0 /* WeaponListView.swift in Sources */,
+				851F336C0574703324CDAAD3 /* WeaponType.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		99DA2252E2046CDDC88E73F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Ratadata;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		A602D82244654A1AA46881AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Ratadata;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		F21012F033DB81E248998239 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Ratadata;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ratadata.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F5E1D723F251AC8363D91872 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Ratadata;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ratadata.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		35B5FE8C03D3E3C603D90CF0 /* Build configuration list for PBXProject "Ratadata" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				99DA2252E2046CDDC88E73F8 /* Debug */,
+				A602D82244654A1AA46881AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EB1FFC6CEBBFAE7B597BE955 /* Build configuration list for PBXNativeTarget "Ratadata" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F21012F033DB81E248998239 /* Debug */,
+				F5E1D723F251AC8363D91872 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 15590F72989B19FA840DC3E7 /* Project object */;
+}

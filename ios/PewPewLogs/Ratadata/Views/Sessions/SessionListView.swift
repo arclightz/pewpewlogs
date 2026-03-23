@@ -257,9 +257,9 @@ struct SessionRowView: View {
     private var sessionTypeIcon: String {
         switch session.type {
         case .kilpailu: "trophy.fill"
-        case .harjoitus: "figure.strengthtraining.traditional"
+        case .harjoitus: "target"
         case .harjoituskilpailu: "flag.fill"
-        case .kuivaharjoittelu: "wind"
+        case .kuivaharjoittelu: "scope"
         case .seuranViikkokisa: "person.3.fill"
         case .valmennus: "graduationcap.fill"
         case .muuMerkinta: "note.text"

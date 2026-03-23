@@ -28,7 +28,7 @@ struct DashboardView: View {
                 .padding(.bottom, 24)
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("PewPewLogs")
+            .navigationTitle("Ratadata")
         }
     }
 
