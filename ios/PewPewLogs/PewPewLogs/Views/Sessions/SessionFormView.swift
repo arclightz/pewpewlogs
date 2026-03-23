@@ -12,10 +12,10 @@ struct SessionFormView: View {
     var sessionToEdit: Session?
     private var isEditing: Bool { sessionToEdit != nil }
 
-    // Form state
+    // Form state — use PersistentIdentifier for picker bindings (value type, reliable)
     @State private var date = Date.now
-    @State private var selectedWeapon: Weapon?
-    @State private var selectedRange: ShootingRange?
+    @State private var selectedWeaponID: PersistentIdentifier?
+    @State private var selectedRangeID: PersistentIdentifier?
     @State private var numberOfShotsFired: Int = 0
     @State private var type: SessionType = .harjoitus
     @State private var sportType: String = ""
@@ -32,12 +32,23 @@ struct SessionFormView: View {
 
     @State private var errorMessage: String?
 
+    // Resolve IDs to model objects
+    private var selectedWeapon: Weapon? {
+        guard let id = selectedWeaponID else { return nil }
+        return weapons.first { $0.persistentModelID == id }
+    }
+
+    private var selectedRange: ShootingRange? {
+        guard let id = selectedRangeID else { return nil }
+        return ranges.first { $0.persistentModelID == id }
+    }
+
     init(session: Session? = nil) {
         self.sessionToEdit = session
         if let session {
             _date = State(initialValue: session.date)
-            _selectedWeapon = State(initialValue: session.weapon)
-            _selectedRange = State(initialValue: session.range)
+            _selectedWeaponID = State(initialValue: session.weapon?.persistentModelID)
+            _selectedRangeID = State(initialValue: session.range?.persistentModelID)
             _numberOfShotsFired = State(initialValue: session.numberOfShotsFired)
             _type = State(initialValue: session.type)
             _sportType = State(initialValue: session.sportType)
@@ -69,10 +80,10 @@ struct SessionFormView: View {
                 DatePicker("Päivämäärä", selection: $date, displayedComponents: .date)
                     .environment(\.locale, Locale(identifier: "fi_FI"))
 
-                Picker("Ampumarata", selection: $selectedRange) {
-                    Text("Valitse rata").tag(nil as ShootingRange?)
+                Picker("Ampumarata", selection: $selectedRangeID) {
+                    Text("Valitse rata").tag(nil as PersistentIdentifier?)
                     ForEach(ranges) { range in
-                        Text(range.name).tag(range as ShootingRange?)
+                        Text(range.name).tag(range.persistentModelID as PersistentIdentifier?)
                     }
                 }
 
@@ -82,13 +93,13 @@ struct SessionFormView: View {
                     }
                 }
 
-                Picker("Ase", selection: $selectedWeapon) {
-                    Text("Valitse ase").tag(nil as Weapon?)
+                Picker("Ase", selection: $selectedWeaponID) {
+                    Text("Valitse ase").tag(nil as PersistentIdentifier?)
                     ForEach(weapons) { weapon in
-                        Text("\(weapon.name) (\(weapon.type.rawValue))").tag(weapon as Weapon?)
+                        Text("\(weapon.name) (\(weapon.type.rawValue))").tag(weapon.persistentModelID as PersistentIdentifier?)
                     }
                 }
-                .onChange(of: selectedWeapon) {
+                .onChange(of: selectedWeaponID) {
                     sportType = "" // Reset when weapon changes
                 }
 
@@ -217,7 +228,7 @@ struct SessionFormView: View {
     }
 
     private func saveSession() {
-        guard isFormValid else {
+        guard let weapon = selectedWeapon, let range = selectedRange, !sportType.isEmpty else {
             errorMessage = "Täytä kaikki pakolliset kentät."
             return
         }
@@ -235,8 +246,8 @@ struct SessionFormView: View {
             session.compScore = Double(compScore.replacingOccurrences(of: ",", with: "."))
             session.distanceToTarget = Double(distanceToTarget)
             session.notes = notes.isEmpty ? nil : notes
-            session.weapon = selectedWeapon
-            session.range = selectedRange
+            session.weapon = weapon
+            session.range = range
             session.updatedAt = .now
         } else {
             // Create new
@@ -252,8 +263,8 @@ struct SessionFormView: View {
                 compScore: Double(compScore.replacingOccurrences(of: ",", with: ".")),
                 distanceToTarget: Double(distanceToTarget),
                 notes: notes.isEmpty ? nil : notes,
-                weapon: selectedWeapon,
-                range: selectedRange
+                weapon: weapon,
+                range: range
             )
             modelContext.insert(session)
         }
