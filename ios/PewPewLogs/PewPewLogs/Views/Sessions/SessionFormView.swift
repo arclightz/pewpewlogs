@@ -101,16 +101,19 @@ struct SessionFormView: View {
                     }
                 }
 
-                // Shot counter with quick-add buttons
+                // Shot counter: manual entry + quick-add buttons
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         Text("Laukauksia")
                         Spacer()
-                        Text("\(numberOfShotsFired)")
+                        TextField("0", value: $numberOfShotsFired, format: .number)
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
                             .font(.title3)
                             .fontWeight(.bold)
                             .monospacedDigit()
                             .foregroundStyle(Color(hex: "667EEA"))
+                            .frame(width: 100)
                     }
                     HStack(spacing: 8) {
                         ForEach([10, 25, 50, 100], id: \.self) { amount in
@@ -119,6 +122,7 @@ struct SessionFormView: View {
                                     numberOfShotsFired += amount
                                 }
                             }
+                            .buttonStyle(.borderless)
                             .font(.caption)
                             .fontWeight(.semibold)
                             .padding(.horizontal, 12)
@@ -133,6 +137,7 @@ struct SessionFormView: View {
                                 numberOfShotsFired = 0
                             }
                         }
+                        .buttonStyle(.borderless)
                         .font(.caption)
                         .fontWeight(.semibold)
                         .padding(.horizontal, 12)
