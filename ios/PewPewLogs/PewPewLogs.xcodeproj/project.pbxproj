@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0FDB32E4CFC98E91923C7DA3 /* SessionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2126128AC9C521C459F4F7D7 /* SessionType.swift */; };
 		19CE72DBEAC7DBBC694A9C19 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50085898D74EA4E81414F70 /* DashboardView.swift */; };
+		1D9E4BD50F9A5C03383724D0 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A16B85B0B8533833050873 /* Theme.swift */; };
 		255444B006E508D7CC321224 /* RangeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0145CFDEBD0B99FF77B16C92 /* RangeDetailView.swift */; };
 		298D97286741D9E8E8C64AC4 /* WeaponFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448ED1CD576D852B03CDF6A1 /* WeaponFormView.swift */; };
 		4748B0C61C1FA9579B6A3EF7 /* SessionRole.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9110DD15816CBBD92CFCABE3 /* SessionRole.swift */; };
@@ -41,6 +42,7 @@
 		3B42E6280A17EAE9BA970315 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		3E12E1AF1E966D36DE76994A /* WeaponListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaponListView.swift; sourceTree = "<group>"; };
 		448ED1CD576D852B03CDF6A1 /* WeaponFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaponFormView.swift; sourceTree = "<group>"; };
+		47A16B85B0B8533833050873 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		533D0702AD62002CFE43F61A /* Weapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weapon.swift; sourceTree = "<group>"; };
 		5923D42575117C875F17FE54 /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
 		5F1B53B74B40AA75A32E7172 /* RangeFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeFormView.swift; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 				F7D2DA4D0F18B5559980D45B /* DateFormatters.swift */,
 				EDB68D5E5E10A555CE4D7018 /* PreviewSampleData.swift */,
 				E0A7BBBC79DC927C8565FE1F /* SportTypeMapping.swift */,
+				47A16B85B0B8533833050873 /* Theme.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -318,6 +321,7 @@
 				9F164C698172F4A478642EFA /* ShootingRange.swift in Sources */,
 				8AFEF977D945EDBCCF1B909E /* SportTypeMapping.swift in Sources */,
 				8DD47011538D8520278571C5 /* StatisticsView.swift in Sources */,
+				1D9E4BD50F9A5C03383724D0 /* Theme.swift in Sources */,
 				64E8C26BFA783E00D0F6B014 /* Weapon.swift in Sources */,
 				842C803D5C07C41A8F417B70 /* WeaponDetailView.swift in Sources */,
 				298D97286741D9E8E8C64AC4 /* WeaponFormView.swift in Sources */,

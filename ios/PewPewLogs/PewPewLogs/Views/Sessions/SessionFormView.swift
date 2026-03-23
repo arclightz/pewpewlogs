@@ -8,6 +8,10 @@ struct SessionFormView: View {
     @Query(sort: \Weapon.name) private var weapons: [Weapon]
     @Query(sort: \ShootingRange.name) private var ranges: [ShootingRange]
 
+    // Edit mode
+    var sessionToEdit: Session?
+    private var isEditing: Bool { sessionToEdit != nil }
+
     // Form state
     @State private var date = Date.now
     @State private var selectedWeapon: Weapon?
@@ -28,6 +32,30 @@ struct SessionFormView: View {
 
     @State private var errorMessage: String?
 
+    init(session: Session? = nil) {
+        self.sessionToEdit = session
+        if let session {
+            _date = State(initialValue: session.date)
+            _selectedWeapon = State(initialValue: session.weapon)
+            _selectedRange = State(initialValue: session.range)
+            _numberOfShotsFired = State(initialValue: session.numberOfShotsFired)
+            _type = State(initialValue: session.type)
+            _sportType = State(initialValue: session.sportType)
+            _role = State(initialValue: session.role)
+            _weather = State(initialValue: session.weather ?? "")
+            _result = State(initialValue: session.result ?? "")
+            _hitFactor = State(initialValue: session.hitFactor.map { String($0) } ?? "")
+            _compScore = State(initialValue: session.compScore.map { String($0) } ?? "")
+            _distanceToTarget = State(initialValue: session.distanceToTarget.map { String(Int($0)) } ?? "")
+            _notes = State(initialValue: session.notes ?? "")
+            _showOptionalFields = State(initialValue:
+                session.result != nil || session.hitFactor != nil ||
+                session.compScore != nil || session.distanceToTarget != nil ||
+                (session.notes != nil && !session.notes!.isEmpty)
+            )
+        }
+    }
+
     /// Available sport types based on selected weapon
     private var availableSportTypes: [String] {
         guard let weapon = selectedWeapon else { return [] }
@@ -37,7 +65,7 @@ struct SessionFormView: View {
     var body: some View {
         Form {
             // MARK: - Mandatory Fields
-            Section("Pakolliset tiedot") {
+            Section {
                 DatePicker("Päivämäärä", selection: $date, displayedComponents: .date)
                     .environment(\.locale, Locale(identifier: "fi_FI"))
 
@@ -74,29 +102,44 @@ struct SessionFormView: View {
                 }
 
                 // Shot counter with quick-add buttons
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         Text("Laukauksia")
                         Spacer()
                         Text("\(numberOfShotsFired)")
-                            .fontWeight(.semibold)
+                            .font(.title3)
+                            .fontWeight(.bold)
                             .monospacedDigit()
+                            .foregroundStyle(Color(hex: "667EEA"))
                     }
                     HStack(spacing: 8) {
                         ForEach([10, 25, 50, 100], id: \.self) { amount in
                             Button("+\(amount)") {
-                                numberOfShotsFired += amount
+                                withAnimation(.snappy(duration: 0.2)) {
+                                    numberOfShotsFired += amount
+                                }
                             }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color(hex: "667EEA").opacity(0.1))
+                            .foregroundStyle(Color(hex: "667EEA"))
+                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                         }
                         Spacer()
                         Button("Nollaa") {
-                            numberOfShotsFired = 0
+                            withAnimation(.snappy(duration: 0.2)) {
+                                numberOfShotsFired = 0
+                            }
                         }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                        .tint(.red)
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.red.opacity(0.1))
+                        .foregroundStyle(.red)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                     }
                 }
 
@@ -107,6 +150,11 @@ struct SessionFormView: View {
                 }
 
                 TextField("Sää", text: $weather, prompt: Text("esim. Aurinkoinen, +15°C"))
+            } header: {
+                Label("Pakolliset tiedot", systemImage: "asterisk")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color(hex: "667EEA"))
             }
 
             // MARK: - Optional Fields
@@ -127,22 +175,28 @@ struct SessionFormView: View {
             // MARK: - Error
             if let errorMessage {
                 Section {
-                    Text(errorMessage)
+                    Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.red)
+                        .font(.subheadline)
                 }
             }
 
             // MARK: - Submit
             Section {
-                Button("Kirjaa suoritus") {
+                Button {
                     saveSession()
+                } label: {
+                    Label(isEditing ? "Tallenna muutokset" : "Kirjaa suoritus",
+                          systemImage: "checkmark.circle.fill")
+                        .primaryButton(AppTheme.successGradient)
                 }
-                .frame(maxWidth: .infinity)
-                .fontWeight(.semibold)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
                 .disabled(!isFormValid)
+                .opacity(isFormValid ? 1 : 0.5)
             }
         }
-        .navigationTitle("Uusi harjoite")
+        .navigationTitle(isEditing ? "Muokkaa harjoitetta" : "Uusi harjoite")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -163,30 +217,65 @@ struct SessionFormView: View {
             return
         }
 
-        let session = Session(
-            date: date,
-            numberOfShotsFired: numberOfShotsFired,
-            type: type,
-            sportType: sportType,
-            role: role,
-            weather: weather.isEmpty ? nil : weather,
-            result: result.isEmpty ? nil : result,
-            hitFactor: Double(hitFactor.replacingOccurrences(of: ",", with: ".")),
-            compScore: Double(compScore.replacingOccurrences(of: ",", with: ".")),
-            distanceToTarget: Double(distanceToTarget),
-            notes: notes.isEmpty ? nil : notes,
-            weapon: selectedWeapon,
-            range: selectedRange
-        )
-
-        modelContext.insert(session)
+        if let session = sessionToEdit {
+            // Update existing
+            session.date = date
+            session.numberOfShotsFired = numberOfShotsFired
+            session.type = type
+            session.sportType = sportType
+            session.role = role
+            session.weather = weather.isEmpty ? nil : weather
+            session.result = result.isEmpty ? nil : result
+            session.hitFactor = Double(hitFactor.replacingOccurrences(of: ",", with: "."))
+            session.compScore = Double(compScore.replacingOccurrences(of: ",", with: "."))
+            session.distanceToTarget = Double(distanceToTarget)
+            session.notes = notes.isEmpty ? nil : notes
+            session.weapon = selectedWeapon
+            session.range = selectedRange
+            session.updatedAt = .now
+        } else {
+            // Create new
+            let session = Session(
+                date: date,
+                numberOfShotsFired: numberOfShotsFired,
+                type: type,
+                sportType: sportType,
+                role: role,
+                weather: weather.isEmpty ? nil : weather,
+                result: result.isEmpty ? nil : result,
+                hitFactor: Double(hitFactor.replacingOccurrences(of: ",", with: ".")),
+                compScore: Double(compScore.replacingOccurrences(of: ",", with: ".")),
+                distanceToTarget: Double(distanceToTarget),
+                notes: notes.isEmpty ? nil : notes,
+                weapon: selectedWeapon,
+                range: selectedRange
+            )
+            modelContext.insert(session)
+        }
         dismiss()
     }
 }
 
-#Preview {
+#Preview("Uusi") {
     NavigationStack {
         SessionFormView()
+    }
+    .modelContainer(PreviewSampleData.container)
+}
+
+#Preview("Muokkaa") {
+    NavigationStack {
+        SessionFormView(session: Session(
+            date: .now,
+            numberOfShotsFired: 150,
+            type: .harjoitus,
+            sportType: "IPSC",
+            role: .ampuja,
+            weather: "Aurinkoinen, +18°C",
+            result: "87%",
+            hitFactor: 5.23,
+            notes: "Hyvä harjoitus"
+        ))
     }
     .modelContainer(PreviewSampleData.container)
 }

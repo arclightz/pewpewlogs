@@ -9,163 +9,300 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 20) {
-                    // MARK: - Welcome Header
-                    VStack(spacing: 8) {
-                        Text("Tervetuloa!")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                        Text("Joko ammutaan lisää?")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.top)
+                VStack(spacing: 24) {
+                    // MARK: - Hero Card
+                    heroCard
 
                     // MARK: - Quick Stats
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 16) {
-                        StatCard(title: "Harjoitteet", value: "\(sessions.count)", icon: "book.fill", color: .blue)
-                        StatCard(title: "Aseet", value: "\(weapons.count)", icon: "target", color: .purple)
-                        StatCard(title: "Radat", value: "\(ranges.count)", icon: "mappin", color: .green)
-                    }
+                    statsRow
 
                     // MARK: - Quick Actions
-                    VStack(spacing: 12) {
-                        Text("Pikatoiminnot")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        NavigationLink {
-                            SessionFormView()
-                        } label: {
-                            QuickActionRow(
-                                title: "Kirjaa uusi harjoite",
-                                icon: "plus.circle.fill",
-                                color: .green
-                            )
-                        }
-
-                        NavigationLink {
-                            WeaponFormView()
-                        } label: {
-                            QuickActionRow(
-                                title: "Lisää uusi ase",
-                                icon: "plus.circle.fill",
-                                color: .purple
-                            )
-                        }
-
-                        NavigationLink {
-                            RangeFormView()
-                        } label: {
-                            QuickActionRow(
-                                title: "Lisää ampumarata",
-                                icon: "plus.circle.fill",
-                                color: .orange
-                            )
-                        }
-                    }
+                    quickActionsSection
 
                     // MARK: - Recent Sessions
                     if !sessions.isEmpty {
-                        VStack(spacing: 12) {
-                            Text("Viimeisimmät harjoitteet")
-                                .font(.headline)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-
-                            ForEach(sessions.prefix(3)) { session in
-                                RecentSessionRow(session: session)
-                            }
-                        }
+                        recentSessionsSection
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.bottom, 24)
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("PewPewLogs")
-            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+
+    // MARK: - Hero Card
+
+    private var heroCard: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "scope")
+                .font(.system(size: 40))
+                .foregroundStyle(.white.opacity(0.9))
+
+            Text("Tervetuloa!")
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundStyle(.white)
+
+            Text("Joko ammutaan lisää?")
+                .font(.subheadline)
+                .foregroundStyle(.white.opacity(0.8))
+
+            if !sessions.isEmpty {
+                let totalShots = sessions.reduce(0) { $0 + $1.numberOfShotsFired }
+                Text("\(totalShots) laukausta kirjattu")
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(.white.opacity(0.2))
+                    .clipShape(Capsule())
+                    .foregroundStyle(.white)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+        .background(AppTheme.primaryGradient)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
+        .shadow(color: Color(hex: "667EEA").opacity(0.3), radius: 16, x: 0, y: 8)
+    }
+
+    // MARK: - Stats Row
+
+    private var statsRow: some View {
+        HStack(spacing: 12) {
+            StatCard(
+                title: "Harjoitteet",
+                value: "\(sessions.count)",
+                icon: "flame.fill",
+                gradient: AppTheme.primaryGradient
+            )
+            StatCard(
+                title: "Aseet",
+                value: "\(weapons.count)",
+                icon: "target",
+                gradient: AppTheme.accentGradient
+            )
+            StatCard(
+                title: "Radat",
+                value: "\(ranges.count)",
+                icon: "mappin.circle.fill",
+                gradient: AppTheme.successGradient
+            )
+        }
+    }
+
+    // MARK: - Quick Actions
+
+    private var quickActionsSection: some View {
+        VStack(spacing: 12) {
+            SectionHeader(title: "Pikatoiminnot", icon: "bolt.fill")
+
+            NavigationLink {
+                SessionFormView()
+            } label: {
+                QuickActionRow(
+                    title: "Kirjaa uusi harjoite",
+                    subtitle: "Lisää ampumaharjoitus tai kilpailu",
+                    icon: "plus.circle.fill",
+                    iconColor: Color(hex: "11998E")
+                )
+            }
+
+            NavigationLink {
+                WeaponFormView()
+            } label: {
+                QuickActionRow(
+                    title: "Lisää uusi ase",
+                    subtitle: "Rekisteröi ase kokoelmaasi",
+                    icon: "plus.circle.fill",
+                    iconColor: Color(hex: "764BA2")
+                )
+            }
+
+            NavigationLink {
+                RangeFormView()
+            } label: {
+                QuickActionRow(
+                    title: "Lisää ampumarata",
+                    subtitle: "Tallenna uusi ampumaratasijainti",
+                    icon: "plus.circle.fill",
+                    iconColor: Color(hex: "F2994A")
+                )
+            }
+        }
+    }
+
+    // MARK: - Recent Sessions
+
+    private var recentSessionsSection: some View {
+        VStack(spacing: 12) {
+            SectionHeader(title: "Viimeisimmät harjoitteet", icon: "clock.fill")
+
+            ForEach(sessions.prefix(3)) { session in
+                NavigationLink {
+                    SessionDetailView(session: session)
+                } label: {
+                    RecentSessionRow(session: session)
+                }
+            }
         }
     }
 }
 
-// MARK: - Supporting Views
+// MARK: - Section Header
+
+struct SectionHeader: View {
+    let title: String
+    let icon: String
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Text(title)
+                .font(.headline)
+            Spacer()
+        }
+    }
+}
+
+// MARK: - Stat Card
 
 private struct StatCard: View {
     let title: String
     let value: String
     let icon: String
-    let color: Color
+    let gradient: LinearGradient
 
     var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(color)
+        VStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(gradient.opacity(0.15))
+                    .frame(width: 40, height: 40)
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(gradient)
+            }
             Text(value)
-                .font(.title)
+                .font(.title2)
                 .fontWeight(.bold)
+                .monospacedDigit()
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(.vertical, 16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
+        .shadow(color: AppTheme.cardShadow, radius: 8, x: 0, y: 4)
     }
 }
+
+// MARK: - Quick Action Row
 
 private struct QuickActionRow: View {
     let title: String
+    let subtitle: String
     let icon: String
-    let color: Color
+    let iconColor: Color
 
     var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(color)
-            Text(title)
-                .foregroundStyle(.primary)
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(iconColor.opacity(0.12))
+                    .frame(width: 44, height: 44)
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundStyle(iconColor)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Spacer()
+
             Image(systemName: "chevron.right")
+                .font(.caption)
+                .fontWeight(.semibold)
                 .foregroundStyle(.tertiary)
         }
-        .padding()
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(14)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
+        .shadow(color: AppTheme.cardShadow, radius: 6, x: 0, y: 3)
     }
 }
+
+// MARK: - Recent Session Row
 
 private struct RecentSessionRow: View {
     let session: Session
 
     var body: some View {
-        HStack {
+        HStack(spacing: 14) {
+            // Type indicator stripe
+            RoundedRectangle(cornerRadius: 2)
+                .fill(AppTheme.sessionTypeGradient(session.type))
+                .frame(width: 4, height: 44)
+
             VStack(alignment: .leading, spacing: 4) {
-                Text(session.date, format: .dateTime.day().month().year())
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                Text("\(session.type.rawValue) — \(session.sportType)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            VStack(alignment: .trailing, spacing: 4) {
-                Text("\(session.numberOfShotsFired) laukausta")
-                    .font(.subheadline)
-                if let weapon = session.weapon {
-                    Text(weapon.name)
+                HStack {
+                    Text(session.date, format: .dateTime.day().month(.abbreviated))
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                    Spacer()
+                    Text(session.type.rawValue)
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(AppTheme.sessionTypeColor(session.type).opacity(0.12))
+                        .foregroundStyle(AppTheme.sessionTypeColor(session.type))
+                        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                }
+
+                HStack {
+                    Label(session.sportType, systemImage: "target")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    Spacer()
+                    HStack(spacing: 4) {
+                        Image(systemName: "flame.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.orange)
+                        Text("\(session.numberOfShotsFired)")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.secondary)
+                    }
+                    if let weapon = session.weapon {
+                        Text("·")
+                            .foregroundStyle(.quaternary)
+                        Text(weapon.name)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }
-        .padding()
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(14)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
+        .shadow(color: AppTheme.cardShadow, radius: 6, x: 0, y: 3)
     }
 }
 

@@ -36,6 +36,7 @@ struct ContentView: View {
                 Label("Tilastot", systemImage: "chart.bar.fill")
             }
         }
+        .tint(Color(hex: "667EEA"))
     }
 }
 
