@@ -28,7 +28,16 @@ struct DashboardView: View {
                 .padding(.bottom, 24)
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("Ratadata")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Image("RatadataIcon")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 36, height: 36)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+            }
         }
     }
 
@@ -36,9 +45,12 @@ struct DashboardView: View {
 
     private var heroCard: some View {
         VStack(spacing: 12) {
-            Image(systemName: "scope")
-                .font(.system(size: 40))
-                .foregroundStyle(.white.opacity(0.9))
+            Image("RatadataLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 100, height: 100)
+                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
 
             Text("Tervetuloa!")
                 .font(.title)

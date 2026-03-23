@@ -19,7 +19,7 @@ struct ContentView: View {
                 WeaponListView()
             }
             .tabItem {
-                Label("Aseet", systemImage: "target")
+                Label("Aseet", systemImage: "shield.fill")
             }
 
             NavigationStack {
