@@ -1,4 +1,6 @@
 import SwiftUI
+import AVKit
+import UIKit
 
 struct SessionDetailView: View {
     @Environment(\.modelContext) private var modelContext
@@ -21,6 +23,12 @@ struct SessionDetailView: View {
                     weaponRangeCard
                     if hasOptionalData {
                         optionalInfoCard
+                    }
+                    if let signatureImage = signatureImage {
+                        signatureCard(signatureImage)
+                    }
+                    if hasMedia {
+                        mediaCard
                     }
                     metadataCard
                 }
@@ -60,6 +68,7 @@ struct SessionDetailView: View {
         }
         .alert("Poista harjoite?", isPresented: $showDeleteConfirmation) {
             Button("Poista", role: .destructive) {
+                SessionMediaStorage.deleteMedia(named: session.photoFileNames + session.videoFileNames)
                 modelContext.delete(session)
                 dismiss()
             }
@@ -180,6 +189,12 @@ struct SessionDetailView: View {
                 if let range = session.range {
                     DetailRow(label: "Ampumarata", value: range.name, icon: "mappin.circle.fill")
                 }
+                if let instructorDisplayName {
+                    if session.weapon != nil || session.range != nil {
+                        Divider().padding(.leading, 44)
+                    }
+                    DetailRow(label: "Ohjaaja/valvoja", value: instructorDisplayName, icon: "person.text.rectangle")
+                }
             }
         }
         .background(.ultraThinMaterial)
@@ -238,6 +253,114 @@ struct SessionDetailView: View {
         .shadow(color: AppTheme.cardShadow, radius: 8, x: 0, y: 4)
     }
 
+    // MARK: - Signature Card
+
+    private var signatureImage: UIImage? {
+        guard let signatureData = session.signature else { return nil }
+        return UIImage(data: signatureData)
+    }
+
+    private var instructorDisplayName: String? {
+        if let name = session.instructorName, !name.isEmpty { return name }
+        if let name = session.instructor?.name, !name.isEmpty { return name }
+        return nil
+    }
+
+    private func signatureCard(_ image: UIImage) -> some View {
+        VStack(spacing: 0) {
+            DetailSectionHeader(title: "Allekirjoitus", icon: "signature")
+
+            VStack(alignment: .leading, spacing: 8) {
+                if let instructorDisplayName {
+                    HStack(spacing: 8) {
+                        Image(systemName: "person.text.rectangle")
+                            .foregroundStyle(.secondary)
+                        Text(instructorDisplayName)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.top, 12)
+                }
+
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxHeight: 150)
+                    .frame(maxWidth: .infinity)
+                    .padding(12)
+            }
+        }
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
+        .shadow(color: AppTheme.cardShadow, radius: 8, x: 0, y: 4)
+    }
+
+    // MARK: - Media Card
+
+    private var hasMedia: Bool {
+        !session.photoFileNames.isEmpty || !session.videoFileNames.isEmpty
+    }
+
+    private var mediaCard: some View {
+        VStack(spacing: 0) {
+            DetailSectionHeader(title: "Media", icon: "photo.stack")
+
+            VStack(alignment: .leading, spacing: 12) {
+                if !session.photoFileNames.isEmpty {
+                    Text("Kuvat")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 8) {
+                            ForEach(session.photoFileNames, id: \.self) { fileName in
+                                if let image = photoImage(for: fileName) {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 120, height: 90)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                }
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+
+                if !session.videoFileNames.isEmpty {
+                    Text("Videot")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    ForEach(Array(session.videoFileNames.enumerated()), id: \.element) { index, fileName in
+                        NavigationLink {
+                            SessionVideoPlayerView(videoURL: SessionMediaStorage.url(for: fileName))
+                        } label: {
+                            HStack {
+                                Label("Video \(index + 1)", systemImage: "video.fill")
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                Image(systemName: "play.circle.fill")
+                                    .foregroundStyle(Color(hex: "667EEA"))
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(14)
+        }
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
+        .shadow(color: AppTheme.cardShadow, radius: 8, x: 0, y: 4)
+    }
+
+    private func photoImage(for fileName: String) -> UIImage? {
+        let url = SessionMediaStorage.url(for: fileName)
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        return UIImage(data: data)
+    }
+
     // MARK: - Metadata Card
 
     private var metadataCard: some View {
@@ -273,6 +396,18 @@ struct SessionDetailView: View {
         case .valmennus: "graduationcap.fill"
         case .muuMerkinta: "note.text"
         }
+    }
+}
+
+private struct SessionVideoPlayerView: View {
+    let videoURL: URL
+
+    var body: some View {
+        VideoPlayer(player: AVPlayer(url: videoURL))
+            .navigationTitle("Video")
+            .navigationBarTitleDisplayMode(.inline)
+            .background(.black)
+            .ignoresSafeArea(edges: .bottom)
     }
 }
 
