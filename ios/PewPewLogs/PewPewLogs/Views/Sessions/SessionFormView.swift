@@ -12,7 +12,7 @@ struct SessionFormView: View {
     var sessionToEdit: Session?
     private var isEditing: Bool { sessionToEdit != nil }
 
-    // Form state — use PersistentIdentifier for picker bindings (value type, reliable)
+    // Form state — use value types (PersistentIdentifier) for reliable @State re-renders
     @State private var date = Date.now
     @State private var selectedWeaponID: PersistentIdentifier?
     @State private var selectedRangeID: PersistentIdentifier?
@@ -31,17 +31,6 @@ struct SessionFormView: View {
     @State private var notes: String = ""
 
     @State private var errorMessage: String?
-
-    // Resolve IDs to model objects
-    private var selectedWeapon: Weapon? {
-        guard let id = selectedWeaponID else { return nil }
-        return weapons.first { $0.persistentModelID == id }
-    }
-
-    private var selectedRange: ShootingRange? {
-        guard let id = selectedRangeID else { return nil }
-        return ranges.first { $0.persistentModelID == id }
-    }
 
     init(session: Session? = nil) {
         self.sessionToEdit = session
@@ -67,6 +56,17 @@ struct SessionFormView: View {
         }
     }
 
+    // Resolve IDs to model objects
+    private var selectedWeapon: Weapon? {
+        guard let id = selectedWeaponID else { return nil }
+        return weapons.first { $0.persistentModelID == id }
+    }
+
+    private var selectedRange: ShootingRange? {
+        guard let id = selectedRangeID else { return nil }
+        return ranges.first { $0.persistentModelID == id }
+    }
+
     /// Available sport types based on selected weapon
     private var availableSportTypes: [String] {
         guard let weapon = selectedWeapon else { return [] }
@@ -80,10 +80,30 @@ struct SessionFormView: View {
                 DatePicker("Päivämäärä", selection: $date, displayedComponents: .date)
                     .environment(\.locale, Locale(identifier: "fi_FI"))
 
-                Picker("Ampumarata", selection: $selectedRangeID) {
-                    Text("Valitse rata").tag(nil as PersistentIdentifier?)
-                    ForEach(ranges) { range in
-                        Text(range.name).tag(range.persistentModelID as PersistentIdentifier?)
+                // Range picker — using Menu for reliable selection
+                HStack {
+                    Text("Ampumarata")
+                    Spacer()
+                    Menu {
+                        ForEach(ranges) { range in
+                            Button {
+                                selectedRangeID = range.persistentModelID
+                            } label: {
+                                if selectedRangeID == range.persistentModelID {
+                                    Label(range.name, systemImage: "checkmark")
+                                } else {
+                                    Text(range.name)
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(selectedRange?.name ?? "Valitse rata")
+                                .foregroundStyle(selectedRange == nil ? .secondary : .primary)
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
 
@@ -93,21 +113,62 @@ struct SessionFormView: View {
                     }
                 }
 
-                Picker("Ase", selection: $selectedWeaponID) {
-                    Text("Valitse ase").tag(nil as PersistentIdentifier?)
-                    ForEach(weapons) { weapon in
-                        Text("\(weapon.name) (\(weapon.type.rawValue))").tag(weapon.persistentModelID as PersistentIdentifier?)
+                // Weapon picker — using Menu for reliable selection
+                HStack {
+                    Text("Ase")
+                    Spacer()
+                    Menu {
+                        ForEach(weapons) { weapon in
+                            Button {
+                                let changed = selectedWeaponID != weapon.persistentModelID
+                                selectedWeaponID = weapon.persistentModelID
+                                if changed {
+                                    sportType = ""
+                                }
+                            } label: {
+                                if selectedWeaponID == weapon.persistentModelID {
+                                    Label("\(weapon.name) (\(weapon.type.rawValue))", systemImage: "checkmark")
+                                } else {
+                                    Text("\(weapon.name) (\(weapon.type.rawValue))")
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(selectedWeapon.map { "\($0.name) (\($0.type.rawValue))" } ?? "Valitse ase")
+                                .foregroundStyle(selectedWeapon == nil ? .secondary : .primary)
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
-                .onChange(of: selectedWeaponID) {
-                    sportType = "" // Reset when weapon changes
-                }
 
+                // Sport type picker — using Menu
                 if !availableSportTypes.isEmpty {
-                    Picker("Laji", selection: $sportType) {
-                        Text("Valitse laji").tag("")
-                        ForEach(availableSportTypes, id: \.self) { sport in
-                            Text(sport).tag(sport)
+                    HStack {
+                        Text("Laji")
+                        Spacer()
+                        Menu {
+                            ForEach(availableSportTypes, id: \.self) { sport in
+                                Button {
+                                    sportType = sport
+                                } label: {
+                                    if sportType == sport {
+                                        Label(sport, systemImage: "checkmark")
+                                    } else {
+                                        Text(sport)
+                                    }
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text(sportType.isEmpty ? "Valitse laji" : sportType)
+                                    .foregroundStyle(sportType.isEmpty ? .secondary : .primary)
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                 }
